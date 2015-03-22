@@ -8,13 +8,24 @@ public class Pers {
 
     private double half = 1;
     private final int how;
+    public boolean checked = false;
 
     public Pers(int how) {
         this.how = how;
     }
 
-    public double getHalf() {
-        return half;
+    public boolean isLive() {
+        return half > 0;
+    }
+
+    public void eat() {
+        half += 1;
+        check();
+    }
+
+    public void hungry() {
+        half -= 0.2;
+        check();
     }
 
     public void setHalf(double half) {
@@ -23,5 +34,9 @@ public class Pers {
 
     public int howIs() {
         return how;
+    }
+
+    public void check() {
+        checked = true;
     }
 }
