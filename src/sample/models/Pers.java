@@ -2,9 +2,9 @@ package sample.models;
 
 public class Pers {
 
-    private static final int WOLF = 1;
-    private static final int WOLFW = 2;
-    private static final int RABBIT = 3;
+    public static final int WOLF = 1;
+    public static final int WOLFW = 2;
+    public static final int RABBIT = 3;
 
     private double half = 1;
     private final int how;
