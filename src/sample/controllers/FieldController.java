@@ -20,24 +20,13 @@ import java.util.Scanner;
 
 public class FieldController extends Application {
 
-    GraphicsContext gc;
-    private final Random random = new Random();
-
-    private static final int TILE_SIZE = 45;
     public static final int SIZE = 20;
 
-    private static final int LEFT_UP = 1;
-    private static final int UP = 2;
-    private static final int RIGHT_UP = 3;
-    private static final int LEFT = 4;
-    private static final int RIGHT = 5;
-    private static final int LEFT_DOWN = 6;
-    private static final int DOWN = 7;
-    private static final int RIGHT_DOWN = 8;
-
-    private final Image wolf = new Image("wolf.png");
-    private final Image rabbit = new Image("rabbit.png");
-    private Pers[][] perses = new Pers[SIZE][SIZE];
+    Pers[][] perses = new Pers[SIZE][SIZE];
+    Random random = new Random();
+    RenderController rc;
+    GraphicsContext gc;
+    Cell now = new Cell();
 
     public static void main(String[] args) {
         launch(args);
@@ -46,18 +35,35 @@ public class FieldController extends Application {
     @Override
     public void start(Stage stage) throws Exception {
 
-        EventHandler handler = new EventHandler<KeyEvent>() {
+        EventHandler<KeyEvent> handler = new EventHandler<KeyEvent>() {
             public void handle(final KeyEvent event) {
-                System.out.println(event.getEventType());
+                step(now);
+                rc.render(perses);
+
+                /* debug */
+                rc.renderRect(now.x, now.y);
+
+                now.x++;
+                if (now.x >= SIZE) {
+                    now.x = 0;
+                    now.y++;
+                    if (now.y >= SIZE) {
+                        now.y = 0;
+                    }
+                }
             }
         };
 
+        now = new Cell(0, 0);
+
         Canvas canvas = new Canvas(1024, 900);
+        canvas.setOnKeyReleased(handler);
+        canvas.setFocusTraversable(true);
         gc = canvas.getGraphicsContext2D();
+        rc = new RenderController(gc);
 
         Group root = new Group();
         root.getChildren().add(canvas);
-        root.addEventHandler(KeyEvent.ANY, handler);
 
         stage.setTitle("Hello World");
         stage.setScene(new Scene(root));
@@ -68,21 +74,17 @@ public class FieldController extends Application {
 
     private void initialize() {
         initRandomPers();
-        renderTiles();
-        gc.restore();
+        rc.renderTiles(perses);
+        gc.restore(); // â rc
 
 //        gameLoop();
     }
 
-    private void gameLoop() {
-        while (true) {
-            step();
-        }
-    }
-
-    private void render() {
-//        tilePane.getChildren().clear();
+    /*    private void render() {
+        gc.clearRect(0, 0, 1024, 900);
         renderTiles();
+//        gc.restore();
+//        gc.stroke();
     }
 
     private void renderTiles() {
@@ -115,7 +117,7 @@ public class FieldController extends Application {
                 break;
             default:
         }
-    }
+    }*/
 
     private void initRandomPers() {
         int[][] _perses = {
@@ -150,11 +152,12 @@ public class FieldController extends Application {
     }
 
     /* Logic */
-    private void step() {
+    public void steps() {
         for (int j = 0; j < SIZE; j++) {
             for (int i = 0; i < SIZE; i++) {
                 Pers pers = perses[j][i];
                 if (pers != null && !pers.checked) {
+                    print(i, j);
                     Cell newCell;
                     Pers next;
                     switch (pers.howIs()) {
@@ -169,8 +172,9 @@ public class FieldController extends Application {
                                 pers.checked = true;
                                 continue;
                             }
-                            move(pers, next);
                             pers.check();
+                            perses[newCell.y][newCell.x] = pers;
+                            perses[j][i] = null;
                             break;
 
                         case Pers.WOLF:
@@ -189,14 +193,69 @@ public class FieldController extends Application {
                                 perses[j][i] = null;
                                 continue;
                             }
-                            move(pers, next);
+                            pers.check();
+                            perses[newCell.y][newCell.x] = pers;
+                            perses[j][i] = null;
                             break;
-                    }
-                    render();
-                    Scanner scanner = new Scanner(System.in);
-                    while (scanner.nextLine().equals("q")) {
+                        default:
+                            System.out.println("wat");
                     }
                 }
+            }
+        }
+        for (int j = 0; j < SIZE; j++) {
+            for (int i = 0; i < SIZE; i++) {
+                if (perses[j][i] != null) perses[j][i].checked = false;
+            }
+        }
+    }
+
+    public void step(Cell now) {
+        int i = now.x, j = now.y;
+
+        Pers pers = perses[j][i];
+        if (pers != null && !pers.checked) {
+            Cell newCell;
+            Pers next;
+            switch (pers.howIs()) {
+                case Pers.RABBIT:
+                    newCell = rabbitStep(new Cell(i, j));
+                    if (newCell == null) {
+                        pers.checked = true;
+                        return;
+                    }
+                    next = perses[newCell.y][newCell.x];
+                    if (next != null && next.howIs() == Pers.RABBIT) {
+                        pers.checked = true;
+                        return;
+                    }
+                    pers.check();
+                    perses[newCell.y][newCell.x] = pers;
+                    perses[j][i] = null;
+                    break;
+
+                case Pers.WOLF:
+                    newCell = wolfStep(new Cell(i, j));
+                    if (newCell == null) {
+                        pers.checked = true;
+                        return;
+                    }
+                    next = perses[newCell.y][newCell.x];
+                    if (next != null && next.howIs() == Pers.RABBIT) {
+                        pers.eat();
+                    } else {
+                        pers.hungry();
+                    }
+                    if (!pers.isLive()) {
+                        perses[j][i] = null;
+                        return;
+                    }
+                    pers.check();
+                    perses[newCell.y][newCell.x] = pers;
+                    perses[j][i] = null;
+                    break;
+                default:
+                    System.out.println("wat");
             }
         }
     }

@@ -18,9 +18,19 @@ public class Cell {
     public int x;
     public int y;
 
+    public Cell() {
+        this.x = 0;
+        this.y = 0;
+    }
+
     public Cell(int x, int y) {
         this.x = x;
         this.y = y;
+    }
+
+    public Cell(Cell c) {
+        this.x = c.x;
+        this.y = c.y;
     }
 
     public Cell(int dir) {
