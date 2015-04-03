@@ -6,7 +6,7 @@ public class Pers {
     public static final int WOLFW = 2;
     public static final int RABBIT = 3;
 
-    private double half = 1;
+    public double half = 1;
     private final int how;
     public boolean checked = false;
 

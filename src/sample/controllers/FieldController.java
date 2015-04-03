@@ -1,24 +1,30 @@
 package sample.controllers;
 
-import javafx.fxml.FXML;
+import javafx.application.Application;
 
+import javafx.event.EventHandler;
+import javafx.scene.Group;
+import javafx.scene.Scene;
+import javafx.scene.canvas.Canvas;
+import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.image.*;
-import javafx.scene.layout.HBox;
-import javafx.scene.layout.TilePane;
+import javafx.scene.input.KeyEvent;
 import javafx.scene.paint.Color;
-import javafx.scene.shape.Rectangle;
+import javafx.stage.Stage;
 import sample.models.Cell;
 import sample.models.Pers;
 
 import java.util.Random;
+import java.util.Scanner;
 
 
-public class FieldController {
+public class FieldController extends Application {
 
+    GraphicsContext gc;
     private final Random random = new Random();
 
     private static final int TILE_SIZE = 45;
-    public static final int SIZE = 10;
+    public static final int SIZE = 20;
 
     private static final int LEFT_UP = 1;
     private static final int UP = 2;
@@ -33,69 +39,106 @@ public class FieldController {
     private final Image rabbit = new Image("rabbit.png");
     private Pers[][] perses = new Pers[SIZE][SIZE];
 
-    @FXML
-    public TilePane tilePane;
+    public static void main(String[] args) {
+        launch(args);
+    }
 
-    @FXML
+    @Override
+    public void start(Stage stage) throws Exception {
+
+        EventHandler handler = new EventHandler<KeyEvent>() {
+            public void handle(final KeyEvent event) {
+                System.out.println(event.getEventType());
+            }
+        };
+
+        Canvas canvas = new Canvas(1024, 900);
+        gc = canvas.getGraphicsContext2D();
+
+        Group root = new Group();
+        root.getChildren().add(canvas);
+        root.addEventHandler(KeyEvent.ANY, handler);
+
+        stage.setTitle("Hello World");
+        stage.setScene(new Scene(root));
+        stage.show();
+
+        initialize();
+    }
+
     private void initialize() {
-        tilePane.setStyle("-fx-background-color: rgba(255, 215, 0, 0.1);");
-        randomPers();
+        initRandomPers();
+        renderTiles();
+        gc.restore();
+
+//        gameLoop();
+    }
+
+    private void gameLoop() {
+        while (true) {
+            step();
+        }
+    }
+
+    private void render() {
+//        tilePane.getChildren().clear();
         renderTiles();
     }
 
     private void renderTiles() {
         for (int j = 0; j < SIZE; j++) {
-            HBox hBox = new HBox();
             for (int i = 0; i < SIZE; i++) {
                 if (perses[j][i] != null) {
-                    createTile(hBox, perses[j][i].howIs());
+                    renderTile(TILE_SIZE * i, TILE_SIZE * j, perses[j][i].howIs());
                 } else {
-                    createTile(hBox, 0);
+                    renderTile(TILE_SIZE * i, TILE_SIZE * j, 0);
                 }
             }
-            tilePane.getChildren().add(hBox);
         }
     }
 
-    private void createTile(HBox hBox, int type) {
+    private void renderTile(int x, int y, int type) {
+        gc.setFill(Color.BLACK);
+        gc.strokeRect(x, y, TILE_SIZE, TILE_SIZE);
         if (type == 0) {
-            Rectangle rectangle = new Rectangle(TILE_SIZE-1, TILE_SIZE-1);
-            rectangle.setStroke(Color.ORANGE);
-            rectangle.setFill(Color.STEELBLUE);
-            hBox.getChildren().add(rectangle);
             return;
         }
-        ImageView imv;
         switch (type) {
             case Pers.WOLF:
-                imv = new ImageView(wolf);
+                gc.drawImage(wolf, x, y, TILE_SIZE, TILE_SIZE);
                 break;
             case Pers.WOLFW:
-                imv = new ImageView(wolf);
+                gc.drawImage(wolf, x, y, TILE_SIZE, TILE_SIZE);
                 break;
             case Pers.RABBIT:
-                imv = new ImageView(rabbit);
+                gc.drawImage(rabbit, x, y, TILE_SIZE, TILE_SIZE);
                 break;
             default:
-                imv = new ImageView();
         }
-        imv.setFitWidth(TILE_SIZE);
-        imv.setPreserveRatio(true);
-        hBox.getChildren().add(imv);
     }
 
-    private void randomPers() {
+    private void initRandomPers() {
         int[][] _perses = {
-                {0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
-                {3, 0, 0, 0, 0, 0, 0, 0, 3, 0},
-                {0, 0, 1, 0, 3, 0, 1, 0, 0, 0},
-                {0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
-                {0, 3, 0, 0, 1, 0, 0, 0, 3, 0},
-                {0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
-                {0, 0, 1, 0, 3, 0, 1, 0, 0, 0},
-                {0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
-                {0, 3, 0, 0, 0, 0, 0, 0, 3, 0},
-                {0, 0, 0, 0, 0, 0, 0, 0, 0, 3},
+                {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+                {3, 0, 0, 0, 0, 0, 0, 0, 3, 0, 3, 0, 0, 0, 0, 0, 0, 0, 3, 0},
+                {0, 0, 1, 0, 3, 0, 1, 0, 0, 0, 0, 0, 1, 0, 3, 0, 1, 0, 0, 0},
+                {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+                {0, 3, 0, 0, 1, 0, 0, 0, 3, 0, 0, 3, 0, 0, 1, 0, 0, 0, 3, 0},
+                {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+                {0, 0, 1, 0, 3, 0, 1, 0, 0, 0, 0, 0, 1, 0, 3, 0, 1, 0, 0, 0},
+                {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+                {0, 3, 0, 0, 0, 0, 0, 0, 3, 0, 0, 3, 0, 0, 0, 0, 0, 0, 3, 0},
+                {0, 0, 0, 0, 0, 0, 0, 0, 0, 3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 3},
+                {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+                {3, 0, 0, 0, 0, 0, 0, 0, 3, 0, 3, 0, 0, 0, 0, 0, 0, 0, 3, 0},
+                {0, 0, 1, 0, 3, 0, 1, 0, 0, 0, 0, 0, 1, 0, 3, 0, 1, 0, 0, 0},
+                {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+                {0, 3, 0, 0, 1, 0, 0, 0, 3, 0, 0, 3, 0, 0, 1, 0, 0, 0, 3, 0},
+                {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+                {0, 0, 1, 0, 3, 0, 1, 0, 0, 0, 0, 0, 1, 0, 3, 0, 1, 0, 0, 0},
+                {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+                {0, 3, 0, 0, 0, 0, 0, 0, 3, 0, 0, 3, 0, 0, 0, 0, 0, 0, 3, 0},
+                {0, 0, 0, 0, 0, 0, 0, 0, 0, 3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 3},
         };
         for (int j = 0; j < SIZE; j++) {
             for (int i = 0; i < SIZE; i++) {
@@ -106,6 +149,7 @@ public class FieldController {
         }
     }
 
+    /* Logic */
     private void step() {
         for (int j = 0; j < SIZE; j++) {
             for (int i = 0; i < SIZE; i++) {
@@ -148,6 +192,10 @@ public class FieldController {
                             move(pers, next);
                             break;
                     }
+                    render();
+                    Scanner scanner = new Scanner(System.in);
+                    while (scanner.nextLine().equals("q")) {
+                    }
                 }
             }
         }
@@ -175,5 +223,37 @@ public class FieldController {
 
     private int getRandom() {
         return 0;
+    }
+
+    private void print(int x, int y) {
+        for (int j = 0; j < SIZE; j++) {
+            for (int i = 0; i < SIZE; i++) {
+                if (perses[j][i] != null) {
+                    String p = " ";
+                    switch (perses[j][i].howIs()) {
+                        case Pers.RABBIT:
+                            p = "R";
+                            break;
+                        case Pers.WOLF:
+                            p = "M";
+                            break;
+                        case Pers.WOLFW:
+                            p = "W";
+                            break;
+                    }
+                    String half = (perses[j][i].half < 10) ? "0" + perses[j][i].half : "" + perses[j][i].half;
+                    if (i == x && j == y) {
+                        System.out.print(p + half + "<");
+                    } else if (perses[j][i].checked) {
+                        System.out.print(p + half + "v");
+                    } else
+                        System.out.print(p + half + "|");
+                } else {
+                    System.out.print("   |");
+                }
+            }
+            System.out.println();
+        }
+        System.out.println();
     }
 }
