@@ -1,10 +1,10 @@
 package sample.models;
 
-import sample.controllers.FieldController;
+import sample.controllers.MainController;
 
 public class Cell {
 
-    public static final int SIZE = FieldController.SIZE;
+    public static final int SIZE = MainController.SIZE;
 
     private static final int LEFT_UP = 1;
     private static final int UP = 2;
@@ -70,6 +70,7 @@ public class Cell {
             default:
                 this.x = 0;
                 this.y = 0;
+                System.out.println("error dir");
         }
     }
 

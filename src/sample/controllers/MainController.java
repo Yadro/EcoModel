@@ -14,18 +14,17 @@ import javafx.stage.Stage;
 import sample.models.Cell;
 import sample.models.Pers;
 
-import java.util.Random;
-import java.util.Scanner;
 
-
-public class FieldController extends Application {
+public class MainController extends Application {
 
     public static final int SIZE = 20;
 
     Pers[][] perses = new Pers[SIZE][SIZE];
-    Random random = new Random();
+
     RenderController rc;
     GraphicsContext gc;
+    PersController pc;
+
     Cell now = new Cell();
 
     public static void main(String[] args) {
@@ -37,20 +36,7 @@ public class FieldController extends Application {
 
         EventHandler<KeyEvent> handler = new EventHandler<KeyEvent>() {
             public void handle(final KeyEvent event) {
-                step(now);
-                rc.render(perses);
-
-                /* debug */
-                rc.renderRect(now.x, now.y);
-
-                now.x++;
-                if (now.x >= SIZE) {
-                    now.x = 0;
-                    now.y++;
-                    if (now.y >= SIZE) {
-                        now.y = 0;
-                    }
-                }
+                debugStep();
             }
         };
 
@@ -74,54 +60,33 @@ public class FieldController extends Application {
 
     private void initialize() {
         initRandomPers();
+        pc = new PersController(SIZE, perses);
         rc.renderTiles(perses);
         gc.restore(); // â rc
 
 //        gameLoop();
     }
 
-    /*    private void render() {
-        gc.clearRect(0, 0, 1024, 900);
-        renderTiles();
-//        gc.restore();
-//        gc.stroke();
-    }
+    void debugStep() {
+        pc.step(now);
+        rc.render(perses);
 
-    private void renderTiles() {
-        for (int j = 0; j < SIZE; j++) {
-            for (int i = 0; i < SIZE; i++) {
-                if (perses[j][i] != null) {
-                    renderTile(TILE_SIZE * i, TILE_SIZE * j, perses[j][i].howIs());
-                } else {
-                    renderTile(TILE_SIZE * i, TILE_SIZE * j, 0);
-                }
+        /* debug */
+        rc.renderRect(now.x, now.y);
+
+        now.x++;
+        if (now.x >= SIZE) {
+            now.x = 0;
+            now.y++;
+            if (now.y >= SIZE) {
+                now.y = 0;
             }
         }
     }
 
-    private void renderTile(int x, int y, int type) {
-        gc.setFill(Color.BLACK);
-        gc.strokeRect(x, y, TILE_SIZE, TILE_SIZE);
-        if (type == 0) {
-            return;
-        }
-        switch (type) {
-            case Pers.WOLF:
-                gc.drawImage(wolf, x, y, TILE_SIZE, TILE_SIZE);
-                break;
-            case Pers.WOLFW:
-                gc.drawImage(wolf, x, y, TILE_SIZE, TILE_SIZE);
-                break;
-            case Pers.RABBIT:
-                gc.drawImage(rabbit, x, y, TILE_SIZE, TILE_SIZE);
-                break;
-            default:
-        }
-    }*/
-
     private void initRandomPers() {
         int[][] _perses = {
-                {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+                {3, 1, 0, 1, 0, 3, 0, 1, 0, 1, 0, 1, 0, 3, 0, 0, 0, 0, 0, 0},
                 {3, 0, 0, 0, 0, 0, 0, 0, 3, 0, 3, 0, 0, 0, 0, 0, 0, 0, 3, 0},
                 {0, 0, 1, 0, 3, 0, 1, 0, 0, 0, 0, 0, 1, 0, 3, 0, 1, 0, 0, 0},
                 {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
@@ -151,7 +116,7 @@ public class FieldController extends Application {
         }
     }
 
-    /* Logic */
+    /* Logic *
     public void steps() {
         for (int j = 0; j < SIZE; j++) {
             for (int i = 0; i < SIZE; i++) {
@@ -314,5 +279,5 @@ public class FieldController extends Application {
             System.out.println();
         }
         System.out.println();
-    }
+    }*/
 }
