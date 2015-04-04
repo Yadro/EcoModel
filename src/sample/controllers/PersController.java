@@ -21,116 +21,30 @@ public class PersController {
         return perses[c.y][c.x];
     }
 
-    public void steps() {
-        for (int j = 0; j < SIZE; j++) {
-            for (int i = 0; i < SIZE; i++) {
-                Pers pers = perses[j][i];
-                if (pers != null && !pers.checked) {
-                    Cell newCell;
-                    Pers next;
-                    switch (pers.howIs()) {
-                        case Pers.RABBIT:
-                            newCell = rabbitStep(pers, new Cell(i, j));
-                            if (newCell == null) {
-                                pers.checked = true;
-                                continue;
-                            }
-                            next = perses[newCell.y][newCell.x];
-                            if (next != null && next.howIs() == Pers.RABBIT) {
-                                pers.checked = true;
-                                continue;
-                            }
-                            pers.check();
-                            perses[newCell.y][newCell.x] = pers;
-                            perses[j][i] = null;
-                            break;
-
-                        case Pers.WOLF:
-                            newCell = wolfStep(pers, new Cell(i, j));
-                            if (newCell == null) {
-                                pers.checked = true;
-                                continue;
-                            }
-                            next = perses[newCell.y][newCell.x];
-                            if (next != null && next.howIs() == Pers.RABBIT) {
-                                pers.eat();
-                            } else {
-                                pers.hungry();
-                            }
-                            if (!pers.isLive()) {
-                                perses[j][i] = null;
-                                continue;
-                            }
-                            pers.check();
-                            perses[newCell.y][newCell.x] = pers;
-                            perses[j][i] = null;
-                            break;
-                        default:
-                            System.out.println("wat");
-                    }
-                }
-            }
-        }
-        for (int j = 0; j < SIZE; j++) {
-            for (int i = 0; i < SIZE; i++) {
-                if (perses[j][i] != null) perses[j][i].checked = false;
-            }
-        }
-    }
-
     public void step(Cell pos, boolean first) {
         int i = pos.x, j = pos.y;
         pos = new Cell(pos);
         Pers pers = getPers(pos);
 
         if (pers != null && !pers.checked) {
-            System.out.println(getPers(pos).howIs());
             if (first) {
                 if (pers.howIs() == Pers.RABBIT) return;
             } else {
                 if (pers.howIs() == Pers.WOLF) return;
             }
-            Cell newPos;
-//            Pers next;
-            switch (pers.howIs()) {
-                case Pers.RABBIT:
+            try {
+                Cell newPos;
+                if (pers.howIs() == Pers.RABBIT) {
                     newPos = rabbitStep(pers, pos);
-                    /*if (newPos == null) {
-                        pers.checked = true;
-                        return;
-                    }
-                    next = perses[newPos.y][newPos.x];
-                    if (next != null && next.howIs() == Pers.RABBIT) {
-                        pers.checked = true;
-                        return;
-                    }
-                    pers.check();*/
-                    perses[newPos.y][newPos.x] = pers;
-                    perses[j][i] = null;
-                    break;
-
-                case Pers.WOLF:
+                } else {
                     newPos = wolfStep(pers, pos);
-                    /*if (newPos == null) {
-                        pers.checked = true;
-                        return;
-                    }
-                    next = perses[newPos.y][newPos.x];
-                    if (next != null && next.howIs() == Pers.RABBIT) {
-                        pers.eat();
-                    } else {
-                        pers.hungry();
-                    }
-                    if (!pers.isLive()) {
-                        perses[j][i] = null;
-                        return;
-                    }
-                    pers.check();*/
+                }
+                if (newPos != null) {
                     perses[newPos.y][newPos.x] = pers;
                     perses[j][i] = null;
-                    break;
-                default:
-                    System.out.println("wat");
+                }
+            } catch (Exception e) {
+                perses[j][i] = null;
             }
         }
     }
@@ -138,14 +52,16 @@ public class PersController {
     private Cell rabbitStep(Pers rabbit, Cell pos) {
         rabbit.check();
         if (random.nextInt(4) == 0) {
-            Cell l = randomStep(pos, false);
-            perses[l.y][l.x] = new Pers(Pers.RABBIT);
+            Cell l = randomStep(pos);
+            if (l != null) {
+                perses[l.y][l.x] = new Pers(Pers.RABBIT);
+            }
             return pos;
         }
-        return randomStep(pos, true);
+        return randomStepZ(pos);
     }
 
-    private Cell wolfStep(Pers wolf, Cell pos) {
+    private Cell wolfStep(Pers wolf, Cell pos) throws Exception {
         wolf.check();
         Cell c = checkAround(pos, Pers.RABBIT);
         if (c != null) {
@@ -156,12 +72,21 @@ public class PersController {
 
         if (wolf.howIs() == Pers.WOLF) {
             c = checkAround(pos, Pers.WOLFW);
+            if (c != null) {
+                getPers(c).pregnant = true;
+                return pos;
+            }
+        } else {
+            if (wolf.pregnant) {
+                wolf.pregnant = false;
+                Cell l = randomStep(pos);
+                if (l != null) {
+                    perses[l.y][l.x] = new Pers(Pers.WOLF);
+                }
+            }
         }
-        if (c != null) {
-            getPers(c).pregnant = true;
-            return pos;
-        }
-        return randomStep(pos, false);
+        if (!wolf.isLive()) throw new Exception();
+        return randomStep(pos);
     }
 
     private Cell checkAround(Cell cell, int type) {
@@ -178,11 +103,8 @@ public class PersController {
         return null;
     }
 
-    private Cell randomStep(Cell pos, boolean stay) {
+    private Cell randomStep(Cell pos) {
         ArrayList<Integer> steps = new ArrayList<>(9);
-        if (stay) {
-            steps.add(0);
-        }
         for (int i = 1; i < 9; i++) {
             Cell c = new Cell(i).add(pos);
             if (c.inField()) {
@@ -191,16 +113,30 @@ public class PersController {
                 }
             }
         }
-        if (steps.size() <= 1) {
-            return pos;
+        if (steps.size() == 0) {
+            return null;
         }
+        steps.forEach(System.out::print);
+        int stepDir = 1 + random.nextInt(steps.size() - 1);
+        System.out.println("->" + stepDir);
 
-        int stepDir;
-        if (stay) {
-            stepDir = random.nextInt(steps.size() - 1);
-        } else {
-            stepDir = 1 + random.nextInt(steps.size() - 2);
+        return pos.add(new Cell(steps.get(stepDir)));
+    }
+
+    private Cell randomStepZ(Cell pos) {
+        ArrayList<Integer> steps = new ArrayList<>(9);
+        for (int i = 1; i < 9; i++) {
+            Cell c = new Cell(i).add(pos);
+            if (c.inField()) {
+                if (getPers(c) == null) {
+                    steps.add(i);
+                }
+            }
         }
+        steps.forEach(System.out::print);
+        int stepDir = random.nextInt(steps.size());
+        System.out.println("->" + stepDir);
+        if (steps.size() == 0 || stepDir == 0) return null;
         return pos.add(new Cell(steps.get(stepDir)));
     }
 

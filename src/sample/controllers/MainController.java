@@ -15,7 +15,7 @@ import sample.models.Pers;
 
 public class MainController extends Application {
 
-    public static final int SIZE = 10;
+    public static final int SIZE = 20;
 
     Pers[][] perses = new Pers[SIZE][SIZE];
 
@@ -36,7 +36,7 @@ public class MainController extends Application {
 
         EventHandler<KeyEvent> handler = new EventHandler<KeyEvent>() {
             public void handle(final KeyEvent event) {
-                debugStep();
+                debugLoop();
             }
         };
 
@@ -65,6 +65,21 @@ public class MainController extends Application {
 //        gc.restore(); // â rc
 
 //        gameLoop();
+    }
+
+    void debugLoop() {
+        for (int j = 0; j < SIZE; j++) {
+            for (int i = 0; i < SIZE; i++) {
+                pc.step(new Cell(i, j), firstFor);
+            }
+        }
+        rc.render(perses);
+        if (firstFor) {
+            firstFor = false;
+        } else {
+            pc.uncheck();
+            firstFor = true;
+        }
     }
 
     void debugStep() {
