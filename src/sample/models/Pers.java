@@ -8,6 +8,7 @@ public class Pers {
 
     public int half = 10;
     private final int how;
+    public boolean pregnant = false;
     public boolean checked = false;
 
     public Pers(int how) {

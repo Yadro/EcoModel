@@ -2,11 +2,13 @@ package sample.controllers;
 
 import sample.models.Cell;
 import sample.models.Pers;
+
+import java.util.ArrayList;
 import java.util.Random;
 
 public class PersController {
 
-    Random random = new Random();
+    Random random = new Random(0);
     public final int SIZE;
     Pers[][] perses;
 
@@ -16,7 +18,7 @@ public class PersController {
     }
 
     Pers getPers(Cell c) {
-        return perses[c.x][c.y];
+        return perses[c.y][c.x];
     }
 
     public void steps() {
@@ -28,7 +30,7 @@ public class PersController {
                     Pers next;
                     switch (pers.howIs()) {
                         case Pers.RABBIT:
-                            newCell = rabbitStep(new Cell(i, j));
+                            newCell = rabbitStep(pers, new Cell(i, j));
                             if (newCell == null) {
                                 pers.checked = true;
                                 continue;
@@ -76,17 +78,24 @@ public class PersController {
         }
     }
 
-    public void step(Cell pos) {
+    public void step(Cell pos, boolean first) {
         int i = pos.x, j = pos.y;
-
+        pos = new Cell(pos);
         Pers pers = getPers(pos);
+
         if (pers != null && !pers.checked) {
+            System.out.println(getPers(pos).howIs());
+            if (first) {
+                if (pers.howIs() == Pers.RABBIT) return;
+            } else {
+                if (pers.howIs() == Pers.WOLF) return;
+            }
             Cell newPos;
-            Pers next;
+//            Pers next;
             switch (pers.howIs()) {
                 case Pers.RABBIT:
-                    newPos = rabbitStep(pos);
-                    if (newPos == null) {
+                    newPos = rabbitStep(pers, pos);
+                    /*if (newPos == null) {
                         pers.checked = true;
                         return;
                     }
@@ -95,14 +104,14 @@ public class PersController {
                         pers.checked = true;
                         return;
                     }
-                    pers.check();
+                    pers.check();*/
                     perses[newPos.y][newPos.x] = pers;
                     perses[j][i] = null;
                     break;
 
                 case Pers.WOLF:
                     newPos = wolfStep(pers, pos);
-                    if (newPos == null) {
+                    /*if (newPos == null) {
                         pers.checked = true;
                         return;
                     }
@@ -116,7 +125,7 @@ public class PersController {
                         perses[j][i] = null;
                         return;
                     }
-                    pers.check();
+                    pers.check();*/
                     perses[newPos.y][newPos.x] = pers;
                     perses[j][i] = null;
                     break;
@@ -126,30 +135,18 @@ public class PersController {
         }
     }
 
-    private Cell checkAround(Cell cell, int type) {
-        for (int i = 1; i < 9; i++) {
-            Cell c = new Cell(i).add(cell);
-            if (c.inField()) {
-                Pers p = getPers(c);
-                if (p != null && p.howIs() == type) {
-                    return c;
-                }
-            }
+    private Cell rabbitStep(Pers rabbit, Cell pos) {
+        rabbit.check();
+        if (random.nextInt(4) == 0) {
+            Cell l = randomStep(pos, false);
+            perses[l.y][l.x] = new Pers(Pers.RABBIT);
+            return pos;
         }
-        return null;
-    }
-
-    private Cell _step(Cell cell, int dir) {
-        Cell newPos = cell.add(new Cell(dir));
-        return newPos.inField() ? newPos : null;
-    }
-
-    private Cell rabbitStep(Cell cell) {
-        int dir = random.nextInt(8);
-        return _step(cell, dir);
+        return randomStep(pos, true);
     }
 
     private Cell wolfStep(Pers wolf, Cell pos) {
+        wolf.check();
         Cell c = checkAround(pos, Pers.RABBIT);
         if (c != null) {
             wolf.eat();
@@ -159,13 +156,59 @@ public class PersController {
 
         if (wolf.howIs() == Pers.WOLF) {
             c = checkAround(pos, Pers.WOLFW);
-        } else {
-            c = checkAround(pos, Pers.WOLF);
         }
         if (c != null) {
+            getPers(c).pregnant = true;
             return pos;
         }
-        int dir = 1 + random.nextInt(7);
-        return _step(pos, dir);
+        return randomStep(pos, false);
+    }
+
+    private Cell checkAround(Cell cell, int type) {
+        for (int i = 1; i < 9; i++) {
+            Cell c = new Cell(i).add(cell);
+            if (c.inField()) {
+                Pers p = getPers(c);
+                if (p != null && p.howIs() == type) {
+                    System.out.println("find: " + type);
+                    return c;
+                }
+            }
+        }
+        return null;
+    }
+
+    private Cell randomStep(Cell pos, boolean stay) {
+        ArrayList<Integer> steps = new ArrayList<>(9);
+        if (stay) {
+            steps.add(0);
+        }
+        for (int i = 1; i < 9; i++) {
+            Cell c = new Cell(i).add(pos);
+            if (c.inField()) {
+                if (getPers(c) == null) {
+                    steps.add(i);
+                }
+            }
+        }
+        if (steps.size() <= 1) {
+            return pos;
+        }
+
+        int stepDir;
+        if (stay) {
+            stepDir = random.nextInt(steps.size() - 1);
+        } else {
+            stepDir = 1 + random.nextInt(steps.size() - 2);
+        }
+        return pos.add(new Cell(steps.get(stepDir)));
+    }
+
+    void uncheck() {
+        for (int j = 0; j < SIZE; j++) {
+            for (int i = 0; i < SIZE; i++) {
+                if (perses[i][j] != null) perses[i][j].checked = false;
+            }
+        }
     }
 }

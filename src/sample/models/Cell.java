@@ -70,7 +70,6 @@ public class Cell {
             default:
                 this.x = 0;
                 this.y = 0;
-                System.out.println("warning cell is 0");
         }
     }
 
@@ -78,6 +77,10 @@ public class Cell {
         this.x += c.x;
         this.y += c.y;
         return this;
+    }
+
+    public Cell and(Cell c) {
+        return new Cell(x + c.x, y + c.y);
     }
 
     /**

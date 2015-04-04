@@ -25,9 +25,19 @@ public class RenderController {
 //        gc.stroke();
     }
 
-    void renderRect(int x, int y) {
+    void renderPos(int x, int y) {
         gc.setStroke(Color.BLACK);
         gc.strokeRect(1 + x * TILE_SIZE, 1 + y * TILE_SIZE, TILE_SIZE - 2, TILE_SIZE - 2);
+        gc.setFill(Color.BLACK);
+        gc.fillText(x + ":" + y, TILE_SIZE * (x + 1), TILE_SIZE * y + 30);
+    }
+
+    void renderDebug(Pers p, int x, int y) {
+        gc.setFill(Color.BLACK);
+        if (p.howIs() != 3) {
+            gc.fillText(String.valueOf(p.half), TILE_SIZE * x, TILE_SIZE * (y + 1));
+        }
+        gc.fillText((p.checked) ? "1": "0", TILE_SIZE * x, TILE_SIZE * y + 10);
     }
 
     void renderTile(Pers p, int x, int y) {
@@ -39,19 +49,16 @@ public class RenderController {
         switch (p.howIs()) {
             case Pers.WOLF:
                 gc.drawImage(wolf, TILE_SIZE * x, TILE_SIZE * y, TILE_SIZE, TILE_SIZE);
-                gc.setFill(Color.BLACK);
-                gc.fillText(String.valueOf(p.half), TILE_SIZE * x, TILE_SIZE * (y + 1));
                 break;
             case Pers.WOLFW:
                 gc.drawImage(wolf, TILE_SIZE * x, TILE_SIZE * y, TILE_SIZE, TILE_SIZE);
-                gc.setFill(Color.BLACK);
-                gc.fillText(String.valueOf(p.half), TILE_SIZE * x, TILE_SIZE * (y + 1));
                 break;
             case Pers.RABBIT:
                 gc.drawImage(rabbit, TILE_SIZE * x, TILE_SIZE * y, TILE_SIZE, TILE_SIZE);
                 break;
             default:
         }
+        renderDebug(p, x, y);
     }
 
     void renderTiles(Pers[][] perses) {
