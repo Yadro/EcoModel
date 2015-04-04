@@ -6,7 +6,7 @@ public class Pers {
     public static final int WOLFW = 2;
     public static final int RABBIT = 3;
 
-    public double half = 1;
+    public int half = 10;
     private final int how;
     public boolean checked = false;
 
@@ -19,16 +19,16 @@ public class Pers {
     }
 
     public void eat() {
-        half += 1;
+        half += 10;
         check();
     }
 
     public void hungry() {
-        half -= 0.2;
+        half -= 2;
         check();
     }
 
-    public void setHalf(double half) {
+    public void setHalf(int half) {
         this.half = half;
     }
 

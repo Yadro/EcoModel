@@ -8,9 +8,10 @@ import sample.models.Pers;
 public class RenderController {
 
     GraphicsContext gc;
+
     static final int TILE_SIZE = 45;
 
-    final Image wolf = new Image("wolf.png");
+    final Image wolf = new Image("wolf_vec2.png");
     final Image rabbit = new Image("rabbit.png");
 
     public RenderController(GraphicsContext gc) {
@@ -29,18 +30,22 @@ public class RenderController {
         gc.strokeRect(1 + x * TILE_SIZE, 1 + y * TILE_SIZE, TILE_SIZE - 2, TILE_SIZE - 2);
     }
 
-    void renderTile(int x, int y, int type) {
+    void renderTile(Pers p, int x, int y) {
         gc.setStroke(Color.GREY);
         gc.strokeRect(x * TILE_SIZE, y * TILE_SIZE, TILE_SIZE, TILE_SIZE);
-        if (type == 0) {
+        if (p == null) {
             return;
         }
-        switch (type) {
+        switch (p.howIs()) {
             case Pers.WOLF:
                 gc.drawImage(wolf, TILE_SIZE * x, TILE_SIZE * y, TILE_SIZE, TILE_SIZE);
+                gc.setFill(Color.BLACK);
+                gc.fillText(String.valueOf(p.half), TILE_SIZE * x, TILE_SIZE * (y + 1));
                 break;
             case Pers.WOLFW:
                 gc.drawImage(wolf, TILE_SIZE * x, TILE_SIZE * y, TILE_SIZE, TILE_SIZE);
+                gc.setFill(Color.BLACK);
+                gc.fillText(String.valueOf(p.half), TILE_SIZE * x, TILE_SIZE * (y + 1));
                 break;
             case Pers.RABBIT:
                 gc.drawImage(rabbit, TILE_SIZE * x, TILE_SIZE * y, TILE_SIZE, TILE_SIZE);
@@ -55,9 +60,9 @@ public class RenderController {
         for (int y = 0; y < lengthY; y++) {
             for (int x = 0; x < lengthX; x++) {
                 if (perses[y][x] != null) {
-                    renderTile(x, y, perses[y][x].howIs());
+                    renderTile(perses[y][x], x, y);
                 } else {
-                    renderTile(x, y, 0);
+                    renderTile(null, x, y);
                 }
             }
         }

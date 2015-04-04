@@ -70,7 +70,7 @@ public class Cell {
             default:
                 this.x = 0;
                 this.y = 0;
-                System.out.println("error dir");
+                System.out.println("warning cell is 0");
         }
     }
 
