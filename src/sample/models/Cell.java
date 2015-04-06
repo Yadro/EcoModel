@@ -90,4 +90,8 @@ public class Cell {
     public boolean inField() {
         return !(y < 0 || x < 0 || x > SIZE - 1 || y > SIZE - 1);
     }
+
+    public String toString() {
+        return x + ":" + y;
+    }
 }

@@ -1,5 +1,6 @@
 package sample.controllers;
 
+import sample.exceptions.PersIsDead;
 import sample.models.Cell;
 import sample.models.Pers;
 
@@ -43,7 +44,7 @@ public class PersController {
                     perses[newPos.y][newPos.x] = pers;
                     perses[j][i] = null;
                 }
-            } catch (Exception e) {
+            } catch (PersIsDead e) {
                 perses[j][i] = null;
             }
         }
@@ -51,17 +52,17 @@ public class PersController {
 
     private Cell rabbitStep(Pers rabbit, Cell pos) {
         rabbit.check();
-        if (random.nextInt(4) == 0) {
+        if (random.nextInt(4) == 1) {
             Cell l = randomStep(pos);
             if (l != null) {
                 perses[l.y][l.x] = new Pers(Pers.RABBIT);
             }
-            return pos;
+            return null;
         }
         return randomStepZ(pos);
     }
 
-    private Cell wolfStep(Pers wolf, Cell pos) throws Exception {
+    private Cell wolfStep(Pers wolf, Cell pos) throws PersIsDead {
         wolf.check();
         Cell c = checkAround(pos, Pers.RABBIT);
         if (c != null) {
@@ -74,18 +75,24 @@ public class PersController {
             c = checkAround(pos, Pers.WOLFW);
             if (c != null) {
                 getPers(c).pregnant = true;
-                return pos;
+                return null;
             }
         } else {
             if (wolf.pregnant) {
                 wolf.pregnant = false;
                 Cell l = randomStep(pos);
                 if (l != null) {
-                    perses[l.y][l.x] = new Pers(Pers.WOLF);
+                    if (random.nextBoolean()) {
+                        perses[l.y][l.x] = new Pers(Pers.WOLF);
+                    } else {
+                        perses[l.y][l.x] = new Pers(Pers.WOLFW);
+                    }
                 }
+                if (!wolf.isLive()) throw new PersIsDead();
+                return null;
             }
         }
-        if (!wolf.isLive()) throw new Exception();
+        if (!wolf.isLive()) throw new PersIsDead();
         return randomStep(pos);
     }
 
@@ -95,7 +102,7 @@ public class PersController {
             if (c.inField()) {
                 Pers p = getPers(c);
                 if (p != null && p.howIs() == type) {
-                    System.out.println("find: " + type);
+                    System.out.println("find on " + i + ": " + type);
                     return c;
                 }
             }
@@ -113,13 +120,10 @@ public class PersController {
                 }
             }
         }
-        if (steps.size() == 0) {
-            return null;
-        }
+        if (steps.size() == 0) return null;
         steps.forEach(System.out::print);
-        int stepDir = 1 + random.nextInt(steps.size() - 1);
-        System.out.println("->" + stepDir);
-
+        int stepDir = random.nextInt(steps.size());
+        System.out.println("->" + steps.get(stepDir));
         return pos.add(new Cell(steps.get(stepDir)));
     }
 
@@ -134,9 +138,10 @@ public class PersController {
             }
         }
         steps.forEach(System.out::print);
+        if (steps.size() == 0) return null;
         int stepDir = random.nextInt(steps.size());
-        System.out.println("->" + stepDir);
-        if (steps.size() == 0 || stepDir == 0) return null;
+        System.out.println("->" + steps.get(stepDir));
+        if (stepDir == 0) return null;
         return pos.add(new Cell(steps.get(stepDir)));
     }
 

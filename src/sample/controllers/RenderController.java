@@ -37,6 +37,9 @@ public class RenderController {
         if (p.howIs() != 3) {
             gc.fillText(String.valueOf(p.half), TILE_SIZE * x, TILE_SIZE * (y + 1));
         }
+        if (p.howIs() == 2) {
+            gc.fillText("w", TILE_SIZE * x + 38, TILE_SIZE * (y + 1));
+        }
         gc.fillText((p.checked) ? "1": "0", TILE_SIZE * x, TILE_SIZE * y + 10);
     }
 
@@ -54,6 +57,7 @@ public class RenderController {
                 gc.drawImage(wolf, TILE_SIZE * x, TILE_SIZE * y, TILE_SIZE, TILE_SIZE);
                 break;
             case Pers.RABBIT:
+                gc.drawImage(rabbit, TILE_SIZE * x, TILE_SIZE * y, TILE_SIZE, TILE_SIZE);
                 gc.drawImage(rabbit, TILE_SIZE * x, TILE_SIZE * y, TILE_SIZE, TILE_SIZE);
                 break;
             default:
