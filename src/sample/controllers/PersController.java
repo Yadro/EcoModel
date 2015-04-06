@@ -22,6 +22,22 @@ public class PersController {
         return perses[c.y][c.x];
     }
 
+    void addPers(Cell c, int type) {
+        Pers p;
+        if (type == Pers.WOLF) {
+            if (random.nextBoolean()) {
+                p = new Pers(Pers.WOLF);
+            } else {
+                p = new Pers(Pers.WOLFW);
+            }
+        } else {
+            p = new Pers(type);
+        }
+        p.check();
+        perses[c.y][c.x] = p;
+        System.out.println("new on " + c + " is " + type);
+    }
+
     public void step(Cell pos, int how) {
         Pers pers = getPers(pos);
         if (pers != null && !pers.checked) {
@@ -58,9 +74,9 @@ public class PersController {
     private Cell rabbitStep(Pers rabbit, Cell pos) {
         rabbit.check();
         if (random.nextInt(4) == 1) {
-            Cell l = randomStep(pos);
-            if (l != null) {
-                perses[l.y][l.x] = new Pers(Pers.RABBIT);
+            Cell p = randomStep(pos);
+            if (p != null) {
+                addPers(p, Pers.RABBIT);
             }
             return null;
         }
@@ -80,18 +96,13 @@ public class PersController {
             c = checkAround(pos, Pers.WOLFW);
             if (c != null) {
                 getPers(c).pregnant = true;
-                return null;
             }
         } else {
             if (wolf.pregnant) {
                 wolf.pregnant = false;
-                Cell l = randomStep(pos);
-                if (l != null) {
-                    if (random.nextBoolean()) {
-                        perses[l.y][l.x] = new Pers(Pers.WOLF);
-                    } else {
-                        perses[l.y][l.x] = new Pers(Pers.WOLFW);
-                    }
+                Cell p = randomStep(pos);
+                if (p != null) {
+                    addPers(p, Pers.WOLF);
                 }
                 if (!wolf.isLive()) throw new PersIsDead();
                 return null;
@@ -101,18 +112,23 @@ public class PersController {
         return randomStep(pos);
     }
 
-    private Cell checkAround(Cell cell, int type) {
+    private Cell checkAround(Cell pos, int type) {
+        ArrayList<Integer> steps = new ArrayList<>(7);
         for (int i = 1; i < 9; i++) {
-            Cell c = new Cell(i).add(cell);
+            Cell c = new Cell(i).and(pos);
             if (c.inField()) {
                 Pers p = getPers(c);
                 if (p != null && p.howIs() == type) {
                     System.out.println("find on " + i + ": " + type);
-                    return c;
+                    steps.add(i);
                 }
             }
         }
-        return null;
+        if (steps.size() == 0) return null;
+        steps.forEach(System.out::print);
+        int stepDir = random.nextInt(steps.size());
+        System.out.println("->" + steps.get(stepDir));
+        return new Cell(steps.get(stepDir)).add(pos);
     }
 
     private Cell randomStep(Cell pos) {
@@ -132,6 +148,7 @@ public class PersController {
         return pos.and(new Cell(steps.get(stepDir)));
     }
 
+    /* todo проверить 0 ход */
     private Cell randomStepZ(Cell pos) {
         ArrayList<Integer> steps = new ArrayList<>(9);
         for (int i = 1; i < 9; i++) {
