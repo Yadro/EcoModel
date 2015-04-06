@@ -22,19 +22,24 @@ public class PersController {
         return perses[c.y][c.x];
     }
 
-    public void step(Cell pos, boolean first) {
-        int i = pos.x, j = pos.y;
-        pos = new Cell(pos);
+    public void step(Cell pos, int how) {
         Pers pers = getPers(pos);
-
         if (pers != null && !pers.checked) {
-            if (first) {
-                if (pers.howIs() == Pers.RABBIT) return;
-            } else {
-                if (pers.howIs() == Pers.WOLF) return;
+            Cell newPos;
+            switch (how) {
+                case Pers.RABBIT:
+                    if (pers.howIs() != Pers.RABBIT) return;
+                    break;
+                case Pers.WOLF:
+                    if (pers.howIs() != Pers.WOLF) return;
+                    break;
+                case Pers.WOLFW:
+                    if (pers.howIs() != Pers.WOLFW) return;
+                    break;
+                default:
+                    break;
             }
             try {
-                Cell newPos;
                 if (pers.howIs() == Pers.RABBIT) {
                     newPos = rabbitStep(pers, pos);
                 } else {
@@ -42,10 +47,10 @@ public class PersController {
                 }
                 if (newPos != null) {
                     perses[newPos.y][newPos.x] = pers;
-                    perses[j][i] = null;
+                    perses[pos.y][pos.x] = null;
                 }
             } catch (PersIsDead e) {
-                perses[j][i] = null;
+                perses[pos.y][pos.x] = null;
             }
         }
     }
@@ -124,7 +129,7 @@ public class PersController {
         steps.forEach(System.out::print);
         int stepDir = random.nextInt(steps.size());
         System.out.println("->" + steps.get(stepDir));
-        return pos.add(new Cell(steps.get(stepDir)));
+        return pos.and(new Cell(steps.get(stepDir)));
     }
 
     private Cell randomStepZ(Cell pos) {
@@ -142,7 +147,7 @@ public class PersController {
         int stepDir = random.nextInt(steps.size());
         System.out.println("->" + steps.get(stepDir));
         if (stepDir == 0) return null;
-        return pos.add(new Cell(steps.get(stepDir)));
+        return pos.and(new Cell(steps.get(stepDir)));
     }
 
     void uncheck() {

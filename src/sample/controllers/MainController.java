@@ -25,7 +25,7 @@ public class MainController extends Application {
 
     Cell now = new Cell();
 
-    boolean firstFor = true;
+    int how = 1;
 
     public static void main(String[] args) {
         launch(args);
@@ -62,31 +62,26 @@ public class MainController extends Application {
         initRandomPers();
         pc = new PersController(SIZE, perses);
         rc.render(perses);
-//        gc.restore(); // â rc
-
-//        gameLoop();
     }
 
     void debugLoop() {
         for (int j = 0; j < SIZE; j++) {
             for (int i = 0; i < SIZE; i++) {
-                pc.step(new Cell(i, j), firstFor);
+                pc.step(new Cell(i, j), how);
             }
         }
         rc.render(perses);
-        if (firstFor) {
-            firstFor = false;
-        } else {
+        if (++how > 3) {
             pc.uncheck();
-            firstFor = true;
+            how = 1;
         }
     }
 
-    void debugStep() {
+    /*void debugStep() {
         pc.step(now, firstFor);
         rc.render(perses);
 
-        /* debug */
+        *//* debug *//*
         rc.renderPos(now.x, now.y);
 
         now.x++;
@@ -103,7 +98,7 @@ public class MainController extends Application {
                 }
             }
         }
-    }
+    }*/
 
     private void initRandomPers() {
         int[][] _perses = {
@@ -111,13 +106,13 @@ public class MainController extends Application {
                 {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
                 {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
                 {0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+                {0, 3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+                {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+                {0, 0, 0, 0, 0, 0, 3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+                {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
                 {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
                 {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
                 {1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1},
-                {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
-                {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
-                {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
-                {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
                 {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
                 {0, 1, 3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
                 {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
@@ -137,169 +132,4 @@ public class MainController extends Application {
             }
         }
     }
-
-    /* Logic *
-    public void steps() {
-        for (int j = 0; j < SIZE; j++) {
-            for (int i = 0; i < SIZE; i++) {
-                Pers pers = perses[j][i];
-                if (pers != null && !pers.checked) {
-                    print(i, j);
-                    Cell newCell;
-                    Pers next;
-                    switch (pers.howIs()) {
-                        case Pers.RABBIT:
-                            newCell = rabbitStep(new Cell(i, j));
-                            if (newCell == null) {
-                                pers.checked = true;
-                                continue;
-                            }
-                            next = perses[newCell.y][newCell.x];
-                            if (next != null && next.howIs() == Pers.RABBIT) {
-                                pers.checked = true;
-                                continue;
-                            }
-                            pers.check();
-                            perses[newCell.y][newCell.x] = pers;
-                            perses[j][i] = null;
-                            break;
-
-                        case Pers.WOLF:
-                            newCell = wolfStep(new Cell(i, j));
-                            if (newCell == null) {
-                                pers.checked = true;
-                                continue;
-                            }
-                            next = perses[newCell.y][newCell.x];
-                            if (next != null && next.howIs() == Pers.RABBIT) {
-                                pers.eat();
-                            } else {
-                                pers.hungry();
-                            }
-                            if (!pers.isLive()) {
-                                perses[j][i] = null;
-                                continue;
-                            }
-                            pers.check();
-                            perses[newCell.y][newCell.x] = pers;
-                            perses[j][i] = null;
-                            break;
-                        default:
-                            System.out.println("wat");
-                    }
-                }
-            }
-        }
-        for (int j = 0; j < SIZE; j++) {
-            for (int i = 0; i < SIZE; i++) {
-                if (perses[j][i] != null) perses[j][i].checked = false;
-            }
-        }
-    }
-
-    public void step(Cell now) {
-        int i = now.x, j = now.y;
-
-        Pers pers = perses[j][i];
-        if (pers != null && !pers.checked) {
-            Cell newCell;
-            Pers next;
-            switch (pers.howIs()) {
-                case Pers.RABBIT:
-                    newCell = rabbitStep(new Cell(i, j));
-                    if (newCell == null) {
-                        pers.checked = true;
-                        return;
-                    }
-                    next = perses[newCell.y][newCell.x];
-                    if (next != null && next.howIs() == Pers.RABBIT) {
-                        pers.checked = true;
-                        return;
-                    }
-                    pers.check();
-                    perses[newCell.y][newCell.x] = pers;
-                    perses[j][i] = null;
-                    break;
-
-                case Pers.WOLF:
-                    newCell = wolfStep(new Cell(i, j));
-                    if (newCell == null) {
-                        pers.checked = true;
-                        return;
-                    }
-                    next = perses[newCell.y][newCell.x];
-                    if (next != null && next.howIs() == Pers.RABBIT) {
-                        pers.eat();
-                    } else {
-                        pers.hungry();
-                    }
-                    if (!pers.isLive()) {
-                        perses[j][i] = null;
-                        return;
-                    }
-                    pers.check();
-                    perses[newCell.y][newCell.x] = pers;
-                    perses[j][i] = null;
-                    break;
-                default:
-                    System.out.println("wat");
-            }
-        }
-    }
-
-    private Cell _step(Cell cell, int dir) {
-        Cell newPos = cell.add(new Cell(dir));
-        return newPos.inField() ? newPos : null;
-    }
-
-    private Cell rabbitStep(Cell cell) {
-        int dir = random.nextInt(8);
-        return _step(cell, dir);
-    }
-
-    private Cell wolfStep(Cell cell) {
-        int dir = 1 + random.nextInt(7);
-        return _step(cell, dir);
-    }
-
-    private void move(Pers from, Pers to) {
-        to = from;
-        from = null;
-    }
-
-    private int getRandom() {
-        return 0;
-    }
-
-    private void print(int x, int y) {
-        for (int j = 0; j < SIZE; j++) {
-            for (int i = 0; i < SIZE; i++) {
-                if (perses[j][i] != null) {
-                    String p = " ";
-                    switch (perses[j][i].howIs()) {
-                        case Pers.RABBIT:
-                            p = "R";
-                            break;
-                        case Pers.WOLF:
-                            p = "M";
-                            break;
-                        case Pers.WOLFW:
-                            p = "W";
-                            break;
-                    }
-                    String half = (perses[j][i].half < 10) ? "0" + perses[j][i].half : "" + perses[j][i].half;
-                    if (i == x && j == y) {
-                        System.out.print(p + half + "<");
-                    } else if (perses[j][i].checked) {
-                        System.out.print(p + half + "v");
-                    } else
-                        System.out.print(p + half + "|");
-                } else {
-                    System.out.print("   |");
-                }
-            }
-            System.out.println();
-        }
-        System.out.println();
-    }*/
 }
