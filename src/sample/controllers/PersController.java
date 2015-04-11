@@ -113,17 +113,7 @@ public class PersController {
     }
 
     private Cell checkAround(Cell pos, int type) {
-        ArrayList<Integer> steps = new ArrayList<>(7);
-        for (int i = 1; i < 9; i++) {
-            Cell c = new Cell(i).and(pos);
-            if (c.inField()) {
-                Pers p = getPers(c);
-                if (p != null && p.howIs() == type) {
-                    System.out.println("find on " + i + ": " + type);
-                    steps.add(i);
-                }
-            }
-        }
+        ArrayList<Integer> steps = getPlaces(pos, type);
         if (steps.size() == 0) return null;
         steps.forEach(System.out::print);
         int stepDir = random.nextInt(steps.size());
@@ -132,15 +122,7 @@ public class PersController {
     }
 
     private Cell randomStep(Cell pos) {
-        ArrayList<Integer> steps = new ArrayList<>(9);
-        for (int i = 1; i < 9; i++) {
-            Cell c = new Cell(i).add(pos);
-            if (c.inField()) {
-                if (getPers(c) == null) {
-                    steps.add(i);
-                }
-            }
-        }
+        ArrayList<Integer> steps = getPlaces(pos, -1);
         if (steps.size() == 0) return null;
         steps.forEach(System.out::print);
         int stepDir = random.nextInt(steps.size());
@@ -148,23 +130,36 @@ public class PersController {
         return pos.and(new Cell(steps.get(stepDir)));
     }
 
-    /* todo проверить 0 ход */
     private Cell randomStepZ(Cell pos) {
-        ArrayList<Integer> steps = new ArrayList<>(9);
+        ArrayList<Integer> steps = getPlaces(pos, -1);
+        if (steps.size() == 0) return null;
+        steps.add(0);
+        int stepDir = random.nextInt(steps.size());
+        steps.forEach(System.out::print);
+        System.out.println("->" + steps.get(stepDir));
+        if (steps.get(stepDir) == 0) return null;
+        return pos.and(new Cell(steps.get(stepDir)));
+    }
+
+    private ArrayList<Integer> getPlaces(Cell pos, int type) {
+        ArrayList<Integer> steps = new ArrayList<>(7);
         for (int i = 1; i < 9; i++) {
             Cell c = new Cell(i).add(pos);
             if (c.inField()) {
-                if (getPers(c) == null) {
-                    steps.add(i);
+                Pers p = getPers(c);
+                if (type >= 0) {
+                    if (p != null && p.howIs() == type) {
+                        System.out.println("find on " + i + ": " + type);
+                        steps.add(i);
+                    }
+                } else {
+                    if (p == null) {
+                        steps.add(i);
+                    }
                 }
             }
         }
-        steps.forEach(System.out::print);
-        if (steps.size() == 0) return null;
-        int stepDir = random.nextInt(steps.size());
-        System.out.println("->" + steps.get(stepDir));
-        if (stepDir == 0) return null;
-        return pos.and(new Cell(steps.get(stepDir)));
+        return steps;
     }
 
     void uncheck() {
