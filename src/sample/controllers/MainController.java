@@ -8,6 +8,7 @@ import javafx.scene.Scene;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.input.KeyEvent;
+import javafx.scene.input.MouseEvent;
 import javafx.stage.Stage;
 import sample.models.Cell;
 import sample.models.Pers;
@@ -22,6 +23,7 @@ public class MainController extends Application {
     RenderController rc;
     GraphicsContext gc;
     PersController pc;
+    TouchController tc;
 
     Cell now = new Cell();
 
@@ -34,19 +36,34 @@ public class MainController extends Application {
     @Override
     public void start(Stage stage) throws Exception {
 
-        EventHandler<KeyEvent> handler = new EventHandler<KeyEvent>() {
-            public void handle(final KeyEvent event) {
-                debugLoop();
+        EventHandler<KeyEvent> handler = event -> debugLoop();
+
+        EventHandler<MouseEvent> mouseEventHandler = e -> {
+            int type = 0;
+            switch (e.getButton()) {
+                case PRIMARY:
+                    type = Pers.WOLF;
+                    break;
+                case MIDDLE:
+                    type = Pers.WOLFW;
+                    break;
+                case SECONDARY:
+                    type = Pers.RABBIT;
+                    break;
             }
+            touchEvent((int) e.getSceneX(), (int) e.getSceneY(), type);
         };
 
         now = new Cell(0, 0);
 
         Canvas canvas = new Canvas(1024, 900);
         canvas.setOnKeyReleased(handler);
+        canvas.setOnMouseClicked(mouseEventHandler);
         canvas.setFocusTraversable(true);
+
         gc = canvas.getGraphicsContext2D();
         rc = new RenderController(gc);
+        tc = new TouchController(perses);
 
         Group root = new Group();
         root.getChildren().add(canvas);
@@ -55,7 +72,7 @@ public class MainController extends Application {
         stage.setScene(new Scene(root));
         stage.show();
 
-        initialize();
+        //initialize();
     }
 
     private void initialize() {
@@ -82,7 +99,6 @@ public class MainController extends Application {
         pc.step(now, firstFor);
         rc.render(perses);
 
-        *//* debug *//*
         rc.renderPos(now.x, now.y);
 
         now.x++;
@@ -132,5 +148,10 @@ public class MainController extends Application {
                 }
             }
         }
+    }
+
+    private void touchEvent(int x, int y, int type) {
+        tc.click(x, y, type);
+        rc.render(perses);
     }
 }
