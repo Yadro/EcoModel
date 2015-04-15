@@ -1,9 +1,14 @@
 package sample.controllers;
 
+import javafx.scene.input.MouseEvent;
 import sample.models.Cell;
 import sample.models.Pers;
 
 public class TouchController implements Tile {
+
+    static final int NEW_GAME = 1;
+    static final int NEXT_STEP = 2;
+    static final int AGAIN = 3;
 
     Pers[][] perses;
 
@@ -11,8 +16,14 @@ public class TouchController implements Tile {
         this.perses = perses;
     }
 
-    void click(int x, int y, int type) {
-        Cell c = new Cell(x / TILE_SIZE, y / TILE_SIZE);
+    void click(MouseEvent e) {
+        Cell c = new Cell((int) e.getX() / TILE_SIZE,(int) e.getY() / TILE_SIZE);
+        int type = 0;
+        switch (e.getButton()) {
+            case PRIMARY: type = Pers.RABBIT; break;
+            case MIDDLE: type = Pers.WOLFW; break;
+            case SECONDARY: type = Pers.WOLF; break;
+        }
         if (c.inField()) {
             if (perses[c.y][c.x] != null) {
                 perses[c.y][c.x] = null;
@@ -22,17 +33,20 @@ public class TouchController implements Tile {
         }
     }
 
-    void clickButton(Cell click) {
-        if (click.x == 20) {
-            if (click.y == 0) {
-
+    int clickButton(MouseEvent e, int status) {
+        int x = (int) e.getX() / TILE_SIZE,
+            y = (int) e.getY() / TILE_SIZE;
+        if (x == 20) {
+            if (y == 0 && status == MainController.CREATE) {
+                return NEW_GAME;
             }
-            if (click.y == 1) {
-
+            if (y == 1 && status == MainController.PLAYED) {
+                return NEXT_STEP;
             }
-            if (click.y == 2) {
-
+            if (y == 2 && status != MainController.CREATE) {
+                return AGAIN;
             }
         }
+        return 0;
     }
 }
