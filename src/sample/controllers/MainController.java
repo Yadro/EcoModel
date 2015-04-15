@@ -54,7 +54,6 @@ public class MainController extends Application implements Consts {
         now = new Cell(0, 0);
 
         Canvas canvas = new Canvas(1024, 900);
-//        canvas.setOnKeyReleased(handler);
         canvas.setOnMouseClicked(mouseEventHandler);
         canvas.setFocusTraversable(true);
 
@@ -71,7 +70,6 @@ public class MainController extends Application implements Consts {
         stage.show();
 
         rc.render(perses, status);
-        //initialize();
     }
 
     private void initialize() {
