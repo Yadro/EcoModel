@@ -4,7 +4,7 @@ import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.paint.Color;
 import sample.models.Pers;
 
-public class RenderController extends Tile {
+public class RenderController implements Tile {
 
     GraphicsContext gc;
 
@@ -40,7 +40,7 @@ public class RenderController extends Tile {
                 gc.fillText("w", TILE_SIZE * x + 38, TILE_SIZE * (y + 1));
             }
         }
-        gc.fillText((p.checked) ? "1": "0", TILE_SIZE * x, TILE_SIZE * y + 10);
+        gc.fillText((p.checked) ? "1" : "0", TILE_SIZE * x, TILE_SIZE * y + 10);
     }
 
     void renderTile(Pers p, int x, int y) {
@@ -75,6 +75,21 @@ public class RenderController extends Tile {
                     renderTile(null, x, y);
                 }
             }
+        }
+    }
+
+    void renderButtons(int status) {
+        switch (status) {
+            case MainController.CREATE:
+                gc.drawImage(play, 20 * TILE_SIZE, 0);
+                break;
+            case MainController.PLAYED:
+                gc.drawImage(next, 20 * TILE_SIZE, 0);
+                gc.drawImage(update, 20 * TILE_SIZE, 1);
+                break;
+            case MainController.END:
+                gc.drawImage(update, 20 * TILE_SIZE, 0);
+                break;
         }
     }
 }

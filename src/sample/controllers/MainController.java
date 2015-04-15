@@ -17,6 +17,10 @@ import sample.models.Pers;
 public class MainController extends Application {
 
     public static final int SIZE = 10;
+    static final int CREATE = 1;
+    static final int PLAYED = 2;
+    static final int END = 3;
+    int process = CREATE;
 
     Pers[][] perses = new Pers[SIZE][SIZE];
 
@@ -68,7 +72,7 @@ public class MainController extends Application {
         Group root = new Group();
         root.getChildren().add(canvas);
 
-        stage.setTitle("Hello World");
+        stage.setTitle("EcoModel");
         stage.setScene(new Scene(root));
         stage.show();
 

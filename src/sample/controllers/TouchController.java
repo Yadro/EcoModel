@@ -3,7 +3,7 @@ package sample.controllers;
 import sample.models.Cell;
 import sample.models.Pers;
 
-public class TouchController extends Tile {
+public class TouchController implements Tile {
 
     Pers[][] perses;
 
@@ -22,7 +22,17 @@ public class TouchController extends Tile {
         }
     }
 
-    boolean pressedCont() {
-        return false;
+    void clickButton(Cell click) {
+        if (click.x == 20) {
+            if (click.y == 0) {
+
+            }
+            if (click.y == 1) {
+
+            }
+            if (click.y == 2) {
+
+            }
+        }
     }
 }
