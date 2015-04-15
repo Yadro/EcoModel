@@ -9,4 +9,6 @@ interface Tile {
     Image play = new Image("play.png");
     Image next = new Image("next.png");
     Image update = new Image("update.png");
+    Image clear = new Image("clear.png");
+
 }

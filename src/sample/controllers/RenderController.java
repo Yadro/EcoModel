@@ -3,11 +3,10 @@ package sample.controllers;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.image.Image;
 import javafx.scene.paint.Color;
-import sample.Tile;
 import sample.models.Pers;
 
 
-public class RenderController implements Tile {
+public class RenderController implements Tile, Consts {
 
     GraphicsContext gc;
 
@@ -85,14 +84,15 @@ public class RenderController implements Tile {
     void renderButtons(int status) {
         switch (status) {
             case MainController.CREATION:
-                drawImage(play, 20, 0);
+                drawImage(play, SIZE, 0);
+                drawImage(clear, SIZE, 1);
                 break;
             case MainController.PLAYING:
-                drawImage(next, 20, 1);
-                drawImage(update, 20, 2);
+                drawImage(next, SIZE, 1);
+                drawImage(update, SIZE, 2);
                 break;
             case MainController.END:
-                drawImage(update, 20, 2);
+                drawImage(update, SIZE, 2);
                 break;
         }
     }

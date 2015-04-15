@@ -18,5 +18,7 @@ public interface Consts {
     int NEXT_STEP = 2;
     /* Again */
     int AGAIN = 3;
+    /* Clear field */
+    int CLEAR = 4;
 
 }

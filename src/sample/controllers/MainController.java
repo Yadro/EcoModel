@@ -19,6 +19,7 @@ public class MainController extends Application implements Consts {
     public Cell now = new Cell();
 
     Pers[][] perses = new Pers[SIZE][SIZE];
+    Pers[][] save;
 
     RenderController rc;
     GraphicsContext gc;
@@ -79,25 +80,20 @@ public class MainController extends Application implements Consts {
 
     void loop(MouseEvent e) {
         switch (tc.clickButton(e, status)) {
-            case TouchController.NEW_GAME:
-                if (status == CREATION) {
-                    status = PLAYING;
-                }
+            case NEW_GAME:
+                status = PLAYING;
+                System.arraycopy(perses, 0, save, 0, perses.length);
                 break;
-            case TouchController.NEXT_STEP:
-                if (status == PLAYING) {
-                    step();
-                    // проверка на кол во персов ->
-                    // status = END;
-                }
+            case NEXT_STEP:
+                step();
+                // проверка на кол во персов ->
+                // status = END;
                 break;
-            case TouchController.AGAIN:
-                if (status == PLAYING || status == END) {
-                    status = CREATION;
-                    // clear
-                    perses = new Pers[SIZE][SIZE];
-                    pc.perses = perses;
-                }
+            case AGAIN:
+                status = CREATION;
+                // clear
+                perses = new Pers[SIZE][SIZE];
+                pc.perses = perses;
                 break;
         }
         switch (status) {
