@@ -37,13 +37,13 @@ public class TouchController implements Tile {
         int x = (int) e.getX() / TILE_SIZE,
             y = (int) e.getY() / TILE_SIZE;
         if (x == 20) {
-            if (y == 0 && status == MainController.CREATE) {
+            if (y == 0 && status == MainController.CREATION) {
                 return NEW_GAME;
             }
-            if (y == 1 && status == MainController.PLAYED) {
+            if (y == 1 && status == MainController.PLAYING) {
                 return NEXT_STEP;
             }
-            if (y == 2 && status != MainController.CREATE) {
+            if (y == 2 && status != MainController.CREATION) {
                 return AGAIN;
             }
         }

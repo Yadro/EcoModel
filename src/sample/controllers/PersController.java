@@ -10,11 +10,10 @@ import java.util.Random;
 public class PersController {
 
     Random random = new Random(0);
-    public final int SIZE;
+    public final int SIZE = MainController.SIZE;
     Pers[][] perses;
 
-    public PersController(int SIZE, Pers[][] perses) {
-        this.SIZE = SIZE;
+    public PersController(Pers[][] perses) {
         this.perses = perses;
     }
 
