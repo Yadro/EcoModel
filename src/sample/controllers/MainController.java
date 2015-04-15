@@ -1,7 +1,6 @@
 package sample.controllers;
 
 import javafx.application.Application;
-
 import javafx.event.EventHandler;
 import javafx.scene.Group;
 import javafx.scene.Scene;
@@ -13,13 +12,8 @@ import javafx.stage.Stage;
 import sample.models.Cell;
 import sample.models.Pers;
 
+public class MainController extends Application implements Consts {
 
-public class MainController extends Application {
-
-    public static final int SIZE = 20;
-    static final int CREATION = 1;
-    static final int PLAYING = 2;
-    static final int END = 3;
     public int status = CREATION;
     public int how = 1;
     public Cell now = new Cell();
@@ -60,13 +54,13 @@ public class MainController extends Application {
         now = new Cell(0, 0);
 
         Canvas canvas = new Canvas(1024, 900);
-        canvas.setOnKeyReleased(handler);
+//        canvas.setOnKeyReleased(handler);
         canvas.setOnMouseClicked(mouseEventHandler);
         canvas.setFocusTraversable(true);
 
         gc = canvas.getGraphicsContext2D();
         rc = new RenderController(gc);
-        tc = new TouchController(perses);
+        tc = new TouchController();
         pc = new PersController(perses);
 
         Group root = new Group();
@@ -76,6 +70,7 @@ public class MainController extends Application {
         stage.setScene(new Scene(root));
         stage.show();
 
+        rc.render(perses, status);
         //initialize();
     }
 
@@ -101,13 +96,15 @@ public class MainController extends Application {
             case TouchController.AGAIN:
                 if (status == PLAYING || status == END) {
                     status = CREATION;
-                    perses = new Pers[SIZE][SIZE]; // clear
+                    // clear
+                    perses = new Pers[SIZE][SIZE];
+                    pc.perses = perses;
                 }
                 break;
         }
         switch (status) {
             case CREATION:
-                tc.click(e);
+                tc.click(e, perses);
                 break;
             case PLAYING:
                 break;
@@ -200,6 +197,6 @@ public class MainController extends Application {
     }
 
     private void createMap(MouseEvent e) {
-        tc.click(e);
+        tc.click(e, perses);
     }
 }

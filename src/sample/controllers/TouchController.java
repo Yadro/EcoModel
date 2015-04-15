@@ -4,19 +4,9 @@ import javafx.scene.input.MouseEvent;
 import sample.models.Cell;
 import sample.models.Pers;
 
-public class TouchController implements Tile {
+public class TouchController implements Tile, Consts {
 
-    static final int NEW_GAME = 1;
-    static final int NEXT_STEP = 2;
-    static final int AGAIN = 3;
-
-    Pers[][] perses;
-
-    public TouchController(Pers[][] perses) {
-        this.perses = perses;
-    }
-
-    void click(MouseEvent e) {
+    void click(MouseEvent e, Pers[][] perses) {
         Cell c = new Cell((int) e.getX() / TILE_SIZE,(int) e.getY() / TILE_SIZE);
         int type = 0;
         switch (e.getButton()) {

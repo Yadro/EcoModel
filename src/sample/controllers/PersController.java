@@ -7,10 +7,9 @@ import sample.models.Pers;
 import java.util.ArrayList;
 import java.util.Random;
 
-public class PersController {
+public class PersController implements Consts {
 
     Random random = new Random(0);
-    public final int SIZE = MainController.SIZE;
     Pers[][] perses;
 
     public PersController(Pers[][] perses) {
