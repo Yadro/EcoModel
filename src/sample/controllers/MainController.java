@@ -16,11 +16,13 @@ import sample.models.Pers;
 
 public class MainController extends Application {
 
-    public static final int SIZE = 10;
-    static final int CREATE = 1;
-    static final int PLAYED = 2;
+    public static final int SIZE = 20;
+    static final int CREATION = 1;
+    static final int PLAYING = 2;
     static final int END = 3;
-    int process = CREATE;
+    public int status = CREATION;
+    public int how = 1;
+    public Cell now = new Cell();
 
     Pers[][] perses = new Pers[SIZE][SIZE];
 
@@ -28,10 +30,6 @@ public class MainController extends Application {
     GraphicsContext gc;
     PersController pc;
     TouchController tc;
-
-    Cell now = new Cell();
-
-    int how = 1;
 
     public static void main(String[] args) {
         launch(args);
@@ -43,7 +41,7 @@ public class MainController extends Application {
         EventHandler<KeyEvent> handler = event -> debugLoop();
 
         EventHandler<MouseEvent> mouseEventHandler = e -> {
-            int type = 0;
+            /*int type = 0;
             switch (e.getButton()) {
                 case PRIMARY:
                     type = Pers.WOLF;
@@ -55,7 +53,8 @@ public class MainController extends Application {
                     type = Pers.RABBIT;
                     break;
             }
-            touchEvent((int) e.getSceneX(), (int) e.getSceneY(), type);
+            createMap((int) e.getSceneX(), (int) e.getSceneY(), type);*/
+            loop(e);
         };
 
         now = new Cell(0, 0);
@@ -68,6 +67,7 @@ public class MainController extends Application {
         gc = canvas.getGraphicsContext2D();
         rc = new RenderController(gc);
         tc = new TouchController(perses);
+        pc = new PersController(perses);
 
         Group root = new Group();
         root.getChildren().add(canvas);
@@ -81,8 +81,53 @@ public class MainController extends Application {
 
     private void initialize() {
         initRandomPers();
-        pc = new PersController(SIZE, perses);
-        rc.render(perses);
+        rc.render(perses, status);
+    }
+
+    void loop(MouseEvent e) {
+        switch (tc.clickButton(e, status)) {
+            case TouchController.NEW_GAME:
+                if (status == CREATION) {
+                    status = PLAYING;
+                }
+                break;
+            case TouchController.NEXT_STEP:
+                if (status == PLAYING) {
+                    step();
+                    // проверка на кол во персов ->
+                    // status = END;
+                }
+                break;
+            case TouchController.AGAIN:
+                if (status == PLAYING || status == END) {
+                    status = CREATION;
+                    perses = new Pers[SIZE][SIZE]; // clear
+                }
+                break;
+        }
+        switch (status) {
+            case CREATION:
+                tc.click(e);
+                break;
+            case PLAYING:
+                break;
+            case END:
+                return;
+        }
+        rc.render(perses, status);
+        System.out.println("render");
+    }
+
+    void step() {
+        for (int k = 1; k < 4; k++) {
+            for (int j = 0; j < SIZE; j++) {
+                for (int i = 0; i < SIZE; i++) {
+                    pc.step(new Cell(i, j), k);
+                }
+            }
+        }
+        pc.uncheck();
+        System.out.println("step");
     }
 
     void debugLoop() {
@@ -91,7 +136,7 @@ public class MainController extends Application {
                 pc.step(new Cell(i, j), how);
             }
         }
-        rc.render(perses);
+        rc.render(perses, status);
         if (++how > 3) {
             pc.uncheck();
             how = 1;
@@ -154,8 +199,7 @@ public class MainController extends Application {
         }
     }
 
-    private void touchEvent(int x, int y, int type) {
-        tc.click(x, y, type);
-        rc.render(perses);
+    private void createMap(MouseEvent e) {
+        tc.click(e);
     }
 }
