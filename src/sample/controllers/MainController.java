@@ -6,7 +6,6 @@ import javafx.scene.Group;
 import javafx.scene.Scene;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
-import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseEvent;
 import javafx.stage.Stage;
 import sample.models.Cell;
@@ -15,8 +14,6 @@ import sample.models.Pers;
 public class MainController extends Application implements Consts {
 
     public int status = CREATION;
-    public int how = 1;
-    public Cell now = new Cell();
 
     Pers[][] perses = new Pers[SIZE][SIZE];
     Pers[][] save   = new Pers[SIZE][SIZE];
@@ -33,26 +30,9 @@ public class MainController extends Application implements Consts {
     @Override
     public void start(Stage stage) throws Exception {
 
-        EventHandler<KeyEvent> handler = event -> debugLoop();
+//        EventHandler<KeyEvent> handler = event -> debugLoop();
 
-        EventHandler<MouseEvent> mouseEventHandler = e -> {
-            /*int type = 0;
-            switch (e.getButton()) {
-                case PRIMARY:
-                    type = Pers.WOLF;
-                    break;
-                case MIDDLE:
-                    type = Pers.WOLFW;
-                    break;
-                case SECONDARY:
-                    type = Pers.RABBIT;
-                    break;
-            }
-            createMap((int) e.getSceneX(), (int) e.getSceneY(), type);*/
-            loop(e);
-        };
-
-        now = new Cell(0, 0);
+        EventHandler<MouseEvent> mouseEventHandler = this::loop;
 
         Canvas canvas = new Canvas(1024, 900);
         canvas.setOnMouseClicked(mouseEventHandler);
@@ -70,11 +50,6 @@ public class MainController extends Application implements Consts {
         stage.setScene(new Scene(root));
         stage.show();
 
-        rc.render(perses, status);
-    }
-
-    private void initialize() {
-        initRandomPers();
         rc.render(perses, status);
     }
 
@@ -124,7 +99,25 @@ public class MainController extends Application implements Consts {
         System.out.println("step");
     }
 
-    void debugLoop() {
+    // todo не работает
+    void restore() {
+        perses = new Pers[SIZE][SIZE];
+        System.arraycopy(save, 0, perses, 0, save.length);
+        pc.perses = perses;
+    }
+
+    boolean peresIsDead() {
+        for (int j = 0; j < SIZE; j++) {
+            for (int i = 0; i < SIZE; i++) {
+                if (perses[j][i] != null) {
+                    return false;
+                }
+            }
+        }
+        return true;
+    }
+
+    /*void debugLoop() {
         for (int j = 0; j < SIZE; j++) {
             for (int i = 0; i < SIZE; i++) {
                 pc.step(new Cell(i, j), how);
@@ -136,7 +129,7 @@ public class MainController extends Application implements Consts {
             how = 1;
         }
         System.out.println("---------");
-    }
+    }*/
 
     /*void debugStep() {
         pc.step(now, firstFor);
@@ -159,6 +152,12 @@ public class MainController extends Application implements Consts {
             }
         }
     }*/
+
+
+    private void initialize() {
+        initRandomPers();
+        rc.render(perses, status);
+    }
 
     private void initRandomPers() {
         int[][] _perses = {
@@ -191,22 +190,5 @@ public class MainController extends Application implements Consts {
                 }
             }
         }
-    }
-
-    void restore() {
-        perses = new Pers[SIZE][SIZE];
-        System.arraycopy(save, 0, perses, 0, save.length);
-        pc.perses = perses;
-    }
-
-    boolean peresIsDead() {
-        for (int j = 0; j < SIZE; j++) {
-            for (int i = 0; i < SIZE; i++) {
-                if (perses[j][i] != null) {
-                    return false;
-                }
-            }
-        }
-        return true;
     }
 }
