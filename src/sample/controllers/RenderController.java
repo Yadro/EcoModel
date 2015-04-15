@@ -1,8 +1,10 @@
 package sample.controllers;
 
 import javafx.scene.canvas.GraphicsContext;
+import javafx.scene.image.Image;
 import javafx.scene.paint.Color;
 import sample.models.Pers;
+
 
 public class RenderController implements Tile {
 
@@ -12,9 +14,10 @@ public class RenderController implements Tile {
         this.gc = gc;
     }
 
-    void render(Pers[][] perses) {
+    void render(Pers[][] perses, int status) {
         gc.clearRect(0, 0, 1024, 900);
         renderTiles(perses);
+        renderButtons(status);
     }
 
     void renderPos(int x, int y) {
@@ -24,8 +27,8 @@ public class RenderController implements Tile {
         gc.fillText(x + ":" + y, TILE_SIZE * (x + 1), TILE_SIZE * y + 30);
     }
 
-    void renderButton() {
-        gc.drawImage(wolf, TILE_SIZE * 21, TILE_SIZE * 25, TILE_SIZE, TILE_SIZE);
+    void drawImage(Image i, int x, int y) {
+        gc.drawImage(i, TILE_SIZE * x, TILE_SIZE * y, TILE_SIZE, TILE_SIZE);
     }
 
     void renderDebug(Pers p, int x, int y) {
@@ -51,13 +54,13 @@ public class RenderController implements Tile {
         }
         switch (p.howIs()) {
             case Pers.WOLF:
-                gc.drawImage(wolf, TILE_SIZE * x, TILE_SIZE * y, TILE_SIZE, TILE_SIZE);
+                drawImage(wolf, x, y);
                 break;
             case Pers.WOLFW:
-                gc.drawImage(wolf, TILE_SIZE * x, TILE_SIZE * y, TILE_SIZE, TILE_SIZE);
+                drawImage(wolf, x, y);
                 break;
             case Pers.RABBIT:
-                gc.drawImage(rabbit, TILE_SIZE * x, TILE_SIZE * y, TILE_SIZE, TILE_SIZE);
+                drawImage(rabbit, x, y);
                 break;
             default:
         }
@@ -80,15 +83,15 @@ public class RenderController implements Tile {
 
     void renderButtons(int status) {
         switch (status) {
-            case MainController.CREATE:
-                gc.drawImage(play, 20 * TILE_SIZE, 0);
+            case MainController.CREATION:
+                drawImage(play, 20, 0);
                 break;
-            case MainController.PLAYED:
-                gc.drawImage(next, 20 * TILE_SIZE, 0);
-                gc.drawImage(update, 20 * TILE_SIZE, 1);
+            case MainController.PLAYING:
+                drawImage(next, 20, 1);
+                drawImage(update, 20, 2);
                 break;
             case MainController.END:
-                gc.drawImage(update, 20 * TILE_SIZE, 0);
+                drawImage(update, 20, 2);
                 break;
         }
     }
