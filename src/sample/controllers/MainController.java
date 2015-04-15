@@ -19,7 +19,7 @@ public class MainController extends Application implements Consts {
     public Cell now = new Cell();
 
     Pers[][] perses = new Pers[SIZE][SIZE];
-    Pers[][] save;
+    Pers[][] save   = new Pers[SIZE][SIZE];
 
     RenderController rc;
     GraphicsContext gc;
@@ -86,12 +86,15 @@ public class MainController extends Application implements Consts {
                 break;
             case NEXT_STEP:
                 step();
-                // проверка на кол во персов ->
-                // status = END;
+                if (peresIsDead()) {
+                    status = END;
+                }
                 break;
             case AGAIN:
                 status = CREATION;
-                // clear
+                restore();
+                break;
+            case CLEAR:
                 perses = new Pers[SIZE][SIZE];
                 pc.perses = perses;
                 break;
@@ -103,7 +106,7 @@ public class MainController extends Application implements Consts {
             case PLAYING:
                 break;
             case END:
-                return;
+                break;
         }
         rc.render(perses, status);
         System.out.println("render");
@@ -190,7 +193,20 @@ public class MainController extends Application implements Consts {
         }
     }
 
-    private void createMap(MouseEvent e) {
-        tc.click(e, perses);
+    void restore() {
+        perses = new Pers[SIZE][SIZE];
+        System.arraycopy(save, 0, perses, 0, save.length);
+        pc.perses = perses;
+    }
+
+    boolean peresIsDead() {
+        for (int j = 0; j < SIZE; j++) {
+            for (int i = 0; i < SIZE; i++) {
+                if (perses[j][i] != null) {
+                    return false;
+                }
+            }
+        }
+        return true;
     }
 }
