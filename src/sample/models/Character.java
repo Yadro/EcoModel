@@ -1,6 +1,6 @@
 package sample.models;
 
-public class Pers {
+public class Character {
 
     public static final int WOLF = 1;
     public static final int WOLFW = 2;
@@ -11,7 +11,7 @@ public class Pers {
     public boolean pregnant = false;
     public boolean checked = false;
 
-    public Pers(int how) {
+    public Character(int how) {
         this.how = how;
     }
 

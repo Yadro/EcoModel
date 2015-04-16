@@ -3,8 +3,7 @@ package sample.controllers;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.image.Image;
 import javafx.scene.paint.Color;
-import sample.models.Pers;
-
+import sample.models.Character;
 
 public class RenderController implements Tile, Consts {
 
@@ -14,7 +13,7 @@ public class RenderController implements Tile, Consts {
         this.gc = gc;
     }
 
-    void render(Pers[][] perses, int status) {
+    void render(Character[][] perses, int status) {
         gc.clearRect(0, 0, 1024, 900);
         renderTiles(perses);
         renderButtons(status);
@@ -31,7 +30,7 @@ public class RenderController implements Tile, Consts {
         gc.drawImage(i, TILE_SIZE * x, TILE_SIZE * y, TILE_SIZE, TILE_SIZE);
     }
 
-    void renderDebug(Pers p, int x, int y) {
+    void renderDebug(Character p, int x, int y) {
         gc.setFill(Color.BLACK);
         if (p.howIs() != 3) {
             gc.fillText(String.valueOf(p.half), TILE_SIZE * x, TILE_SIZE * (y + 1));
@@ -46,20 +45,20 @@ public class RenderController implements Tile, Consts {
         gc.fillText((p.checked) ? "1" : "0", TILE_SIZE * x, TILE_SIZE * y + 10);
     }
 
-    void renderTile(Pers p, int x, int y) {
+    void renderTile(Character p, int x, int y) {
         gc.setStroke(Color.GREY);
         gc.strokeRect(x * TILE_SIZE, y * TILE_SIZE, TILE_SIZE, TILE_SIZE);
         if (p == null) {
             return;
         }
         switch (p.howIs()) {
-            case Pers.WOLF:
+            case Character.WOLF:
                 drawImage(wolf, x, y);
                 break;
-            case Pers.WOLFW:
+            case Character.WOLFW:
                 drawImage(wolf, x, y);
                 break;
-            case Pers.RABBIT:
+            case Character.RABBIT:
                 drawImage(rabbit, x, y);
                 break;
             default:
@@ -67,7 +66,7 @@ public class RenderController implements Tile, Consts {
         renderDebug(p, x, y);
     }
 
-    void renderTiles(Pers[][] perses) {
+    void renderTiles(Character[][] perses) {
         int lengthY = perses.length;
         int lengthX = perses[0].length;
         for (int y = 0; y < lengthY; y++) {

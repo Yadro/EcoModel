@@ -9,18 +9,18 @@ import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.input.MouseEvent;
 import javafx.stage.Stage;
 import sample.models.Cell;
-import sample.models.Pers;
+import sample.models.Character;
 
 public class MainController extends Application implements Consts {
 
     public int status = CREATION;
 
-    Pers[][] perses = new Pers[SIZE][SIZE];
-    Pers[][] save   = new Pers[SIZE][SIZE];
+    Character[][] characters = new Character[SIZE][SIZE];
+    Character[][] save       = new Character[SIZE][SIZE];
 
     RenderController rc;
     GraphicsContext gc;
-    PersController pc;
+    CharacterController pc;
     TouchController tc;
 
     public static void main(String[] args) {
@@ -41,7 +41,7 @@ public class MainController extends Application implements Consts {
         gc = canvas.getGraphicsContext2D();
         rc = new RenderController(gc);
         tc = new TouchController();
-        pc = new PersController(perses);
+        pc = new CharacterController(characters);
 
         Group root = new Group();
         root.getChildren().add(canvas);
@@ -50,14 +50,14 @@ public class MainController extends Application implements Consts {
         stage.setScene(new Scene(root));
         stage.show();
 
-        rc.render(perses, status);
+        rc.render(characters, status);
     }
 
     void loop(MouseEvent e) {
         switch (tc.clickButton(e, status)) {
             case NEW_GAME:
                 status = PLAYING;
-                System.arraycopy(perses, 0, save, 0, perses.length);
+                System.arraycopy(characters, 0, save, 0, characters.length);
                 break;
             case NEXT_STEP:
                 step();
@@ -70,20 +70,20 @@ public class MainController extends Application implements Consts {
                 restore();
                 break;
             case CLEAR:
-                perses = new Pers[SIZE][SIZE];
-                pc.perses = perses;
+                characters = new Character[SIZE][SIZE];
+                pc.characters = characters;
                 break;
         }
         switch (status) {
             case CREATION:
-                tc.click(e, perses);
+                tc.click(e, characters);
                 break;
             case PLAYING:
                 break;
             case END:
                 break;
         }
-        rc.render(perses, status);
+        rc.render(characters, status);
         System.out.println("render");
     }
 
@@ -101,15 +101,15 @@ public class MainController extends Application implements Consts {
 
     // todo не работает
     void restore() {
-        perses = new Pers[SIZE][SIZE];
-        System.arraycopy(save, 0, perses, 0, save.length);
-        pc.perses = perses;
+        characters = new Character[SIZE][SIZE];
+        System.arraycopy(save, 0, characters, 0, save.length);
+        pc.characters = characters;
     }
 
     boolean peresIsDead() {
         for (int j = 0; j < SIZE; j++) {
             for (int i = 0; i < SIZE; i++) {
-                if (perses[j][i] != null) {
+                if (characters[j][i] != null) {
                     return false;
                 }
             }
@@ -123,7 +123,7 @@ public class MainController extends Application implements Consts {
                 pc.step(new Cell(i, j), how);
             }
         }
-        rc.render(perses, status);
+        rc.render(characters, status);
         if (++how > 3) {
             pc.uncheck();
             how = 1;
@@ -133,7 +133,7 @@ public class MainController extends Application implements Consts {
 
     /*void debugStep() {
         pc.step(now, firstFor);
-        rc.render(perses);
+        rc.render(characters);
 
         rc.renderPos(now.x, now.y);
 
@@ -156,7 +156,7 @@ public class MainController extends Application implements Consts {
 
     private void initialize() {
         initRandomPers();
-        rc.render(perses, status);
+        rc.render(characters, status);
     }
 
     private void initRandomPers() {
@@ -186,7 +186,7 @@ public class MainController extends Application implements Consts {
         for (int j = 0; j < SIZE; j++) {
             for (int i = 0; i < SIZE; i++) {
                 if (_perses[i][j] != 0) {
-                    perses[i][j] = new Pers(_perses[i][j]);
+                    characters[i][j] = new Character(_perses[i][j]);
                 }
             }
         }

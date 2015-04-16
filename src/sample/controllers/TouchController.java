@@ -2,27 +2,38 @@ package sample.controllers;
 
 import javafx.scene.input.MouseEvent;
 import sample.models.Cell;
-import sample.models.Pers;
+import sample.models.Character;
 
 public class TouchController implements Tile, Consts {
 
-    void click(MouseEvent e, Pers[][] perses) {
+    /**
+     * Handling mouse events.
+     * @param e mouse event
+     * @param characters array of the characters
+     */
+    void click(MouseEvent e, Character[][] characters) {
         Cell c = new Cell((int) e.getX() / TILE_SIZE,(int) e.getY() / TILE_SIZE);
         int type = 0;
         switch (e.getButton()) {
-            case PRIMARY: type = Pers.RABBIT; break;
-            case MIDDLE: type = Pers.WOLFW; break;
-            case SECONDARY: type = Pers.WOLF; break;
+            case PRIMARY: type = Character.RABBIT; break;
+            case MIDDLE: type = Character.WOLFW; break;
+            case SECONDARY: type = Character.WOLF; break;
         }
         if (c.inField()) {
-            if (perses[c.y][c.x] != null) {
-                perses[c.y][c.x] = null;
+            if (characters[c.y][c.x] != null) {
+                characters[c.y][c.x] = null;
             } else {
-                perses[c.y][c.x] = new Pers(type);
+                characters[c.y][c.x] = new Character(type);
             }
         }
     }
 
+    /**
+     * Handling mouse events
+     * @param e mouse event
+     * @param status application status
+     * @return event
+     */
     int clickButton(MouseEvent e, int status) {
         int x = (int) e.getX() / TILE_SIZE,
             y = (int) e.getY() / TILE_SIZE;

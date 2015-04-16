@@ -1,112 +1,112 @@
 package sample.controllers;
 
-import sample.exceptions.PersIsDead;
+import sample.exceptions.CharacterIsDead;
 import sample.models.Cell;
-import sample.models.Pers;
+import sample.models.Character;
 
 import java.util.ArrayList;
 import java.util.Random;
 
-public class PersController implements Consts {
+public class CharacterController implements Consts {
 
     Random random = new Random(0);
-    Pers[][] perses;
+    Character[][] characters;
 
-    public PersController(Pers[][] perses) {
-        this.perses = perses;
+    public CharacterController(Character[][] characters) {
+        this.characters = characters;
     }
 
-    Pers getPers(Cell c) {
-        return perses[c.y][c.x];
+    Character getCharacter(Cell c) {
+        return characters[c.y][c.x];
     }
 
-    void addPers(Cell c, int type) {
-        Pers p;
-        if (type == Pers.WOLF) {
+    void addCharacter(Cell c, int type) {
+        Character p;
+        if (type == Character.WOLF) {
             if (random.nextBoolean()) {
-                p = new Pers(Pers.WOLF);
+                p = new Character(Character.WOLF);
             } else {
-                p = new Pers(Pers.WOLFW);
+                p = new Character(Character.WOLFW);
             }
         } else {
-            p = new Pers(type);
+            p = new Character(type);
         }
         p.check();
-        perses[c.y][c.x] = p;
+        characters[c.y][c.x] = p;
         System.out.println("new on " + c + " is " + type);
     }
 
     public void step(Cell pos, int how) {
-        Pers pers = getPers(pos);
-        if (pers != null && !pers.checked) {
+        Character character = getCharacter(pos);
+        if (character != null && !character.checked) {
             Cell newPos;
             switch (how) {
-                case Pers.RABBIT:
-                    if (pers.howIs() != Pers.RABBIT) return;
+                case Character.RABBIT:
+                    if (character.howIs() != Character.RABBIT) return;
                     break;
-                case Pers.WOLF:
-                    if (pers.howIs() != Pers.WOLF) return;
+                case Character.WOLF:
+                    if (character.howIs() != Character.WOLF) return;
                     break;
-                case Pers.WOLFW:
-                    if (pers.howIs() != Pers.WOLFW) return;
+                case Character.WOLFW:
+                    if (character.howIs() != Character.WOLFW) return;
                     break;
                 default:
                     break;
             }
             try {
-                if (pers.howIs() == Pers.RABBIT) {
-                    newPos = rabbitStep(pers, pos);
+                if (character.howIs() == Character.RABBIT) {
+                    newPos = rabbitStep(character, pos);
                 } else {
-                    newPos = wolfStep(pers, pos);
+                    newPos = wolfStep(character, pos);
                 }
                 if (newPos != null) {
-                    perses[newPos.y][newPos.x] = pers;
-                    perses[pos.y][pos.x] = null;
+                    characters[newPos.y][newPos.x] = character;
+                    characters[pos.y][pos.x] = null;
                 }
-            } catch (PersIsDead e) {
-                perses[pos.y][pos.x] = null;
+            } catch (CharacterIsDead e) {
+                characters[pos.y][pos.x] = null;
             }
         }
     }
 
-    private Cell rabbitStep(Pers rabbit, Cell pos) {
+    private Cell rabbitStep(Character rabbit, Cell pos) {
         rabbit.check();
         if (random.nextInt(4) == 1) {
             Cell p = randomStep(pos);
             if (p != null) {
-                addPers(p, Pers.RABBIT);
+                addCharacter(p, Character.RABBIT);
             }
             return null;
         }
         return randomStepZ(pos);
     }
 
-    private Cell wolfStep(Pers wolf, Cell pos) throws PersIsDead {
+    private Cell wolfStep(Character wolf, Cell pos) throws CharacterIsDead {
         wolf.check();
-        Cell c = checkAround(pos, Pers.RABBIT);
+        Cell c = checkAround(pos, Character.RABBIT);
         if (c != null) {
             wolf.eat();
             return c;
         }
         wolf.hungry();
 
-        if (wolf.howIs() == Pers.WOLF) {
-            c = checkAround(pos, Pers.WOLFW);
+        if (wolf.howIs() == Character.WOLF) {
+            c = checkAround(pos, Character.WOLFW);
             if (c != null) {
-                getPers(c).pregnant = true;
+                getCharacter(c).pregnant = true;
             }
         } else {
             if (wolf.pregnant) {
                 wolf.pregnant = false;
                 Cell p = randomStep(pos);
                 if (p != null) {
-                    addPers(p, Pers.WOLF);
+                    addCharacter(p, Character.WOLF);
                 }
-                if (!wolf.isLive()) throw new PersIsDead();
+                if (!wolf.isLive()) throw new CharacterIsDead();
                 return null;
             }
         }
-        if (!wolf.isLive()) throw new PersIsDead();
+        if (!wolf.isLive()) throw new CharacterIsDead();
         return randomStep(pos);
     }
 
@@ -144,7 +144,7 @@ public class PersController implements Consts {
         for (int i = 1; i < 9; i++) {
             Cell c = new Cell(i).add(pos);
             if (c.inField()) {
-                Pers p = getPers(c);
+                Character p = getCharacter(c);
                 if (type >= 0) {
                     if (p != null && p.howIs() == type) {
                         System.out.println("find on " + i + ": " + type);
@@ -163,7 +163,7 @@ public class PersController implements Consts {
     void uncheck() {
         for (int j = 0; j < SIZE; j++) {
             for (int i = 0; i < SIZE; i++) {
-                if (perses[i][j] != null) perses[i][j].checked = false;
+                if (characters[i][j] != null) characters[i][j].checked = false;
             }
         }
     }
