@@ -1,6 +1,7 @@
 package sample.controllers;
 
 import javafx.scene.input.MouseEvent;
+
 import sample.models.Cell;
 import sample.models.Character;
 

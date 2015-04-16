@@ -11,12 +11,18 @@ import javafx.stage.Stage;
 import sample.models.Cell;
 import sample.models.Character;
 
+/**
+ * Main class.
+ */
 public class MainController extends Application implements Consts {
 
+    /* Application status */
     public int status = CREATION;
 
+    /* Characters array */
     Character[][] characters = new Character[SIZE][SIZE];
-    Character[][] save       = new Character[SIZE][SIZE];
+    /* Saved characters */
+    Character[][] save = new Character[SIZE][SIZE];
 
     RenderController rc;
     GraphicsContext gc;
@@ -29,64 +35,45 @@ public class MainController extends Application implements Consts {
 
     @Override
     public void start(Stage stage) throws Exception {
-
-//        EventHandler<KeyEvent> handler = event -> debugLoop();
-
         EventHandler<MouseEvent> mouseEventHandler = this::loop;
-
         Canvas canvas = new Canvas(1024, 900);
         canvas.setOnMouseClicked(mouseEventHandler);
         canvas.setFocusTraversable(true);
-
         gc = canvas.getGraphicsContext2D();
         rc = new RenderController(gc);
         tc = new TouchController();
         pc = new CharacterController(characters);
-
         Group root = new Group();
         root.getChildren().add(canvas);
-
         stage.setTitle("EcoModel");
         stage.setScene(new Scene(root));
         stage.show();
-
         rc.render(characters, status);
     }
 
+    /**
+     * Application loop.
+     * @param e mouse event
+     */
     void loop(MouseEvent e) {
         switch (tc.clickButton(e, status)) {
-            case NEW_GAME:
-                status = PLAYING;
-                System.arraycopy(characters, 0, save, 0, characters.length);
-                break;
-            case NEXT_STEP:
-                step();
-                if (peresIsDead()) {
-                    status = END;
-                }
-                break;
-            case AGAIN:
-                status = CREATION;
-                restore();
-                break;
-            case CLEAR:
-                characters = new Character[SIZE][SIZE];
-                pc.characters = characters;
-                break;
+            case NEW_GAME: startGame(); break;
+            case NEXT_STEP: makeStep(); break;
+            case AGAIN: beginNewGame(); break;
+            case CLEAR: clearField(); break;
         }
         switch (status) {
-            case CREATION:
-                tc.click(e, characters);
-                break;
-            case PLAYING:
-                break;
-            case END:
-                break;
+            case CREATION: tc.click(e, characters); break;
+            case PLAYING: break;
+            case END: break;
         }
         rc.render(characters, status);
         System.out.println("render");
     }
 
+    /**
+     * Move all the characters.
+     */
     void step() {
         for (int k = 1; k < 4; k++) {
             for (int j = 0; j < SIZE; j++) {
@@ -106,7 +93,45 @@ public class MainController extends Application implements Consts {
         pc.characters = characters;
     }
 
-    boolean peresIsDead() {
+    /**
+     * Start processing steps.
+     */
+    void startGame() {
+        status = PLAYING;
+        System.arraycopy(characters, 0, save, 0, characters.length);
+    }
+
+    /**
+     * A step of all the characters.
+     */
+    void makeStep() {
+        step();
+        if (characterIsDead()) {
+            status = END;
+        }
+    }
+
+    /**
+     * Begin new game.
+     */
+    void beginNewGame() {
+        status = CREATION;
+        restore();
+    }
+
+    /**
+     * Clear field.
+     */
+    void clearField() {
+        characters = new Character[SIZE][SIZE];
+        pc.characters = characters;
+    }
+
+    /**
+     * Checks whether characters left.
+     * @return answer
+     */
+    boolean characterIsDead() {
         for (int j = 0; j < SIZE; j++) {
             for (int i = 0; i < SIZE; i++) {
                 if (characters[j][i] != null) {

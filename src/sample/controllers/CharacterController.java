@@ -7,19 +7,37 @@ import sample.models.Character;
 import java.util.ArrayList;
 import java.util.Random;
 
+/**
+ * Processing move characters.
+ */
 public class CharacterController implements Consts {
 
     Random random = new Random(0);
+    /* Characters array */
     Character[][] characters;
 
+    /**
+     * Save characters array.
+     * @param characters array
+     */
     public CharacterController(Character[][] characters) {
         this.characters = characters;
     }
 
+    /**
+     * Return character of the cell.
+     * @param c cell
+     * @return character found
+     */
     Character getCharacter(Cell c) {
         return characters[c.y][c.x];
     }
 
+    /**
+     * Add new character by type.
+     * @param c cell
+     * @param type type of character
+     */
     void addCharacter(Cell c, int type) {
         Character p;
         if (type == Character.WOLF) {
@@ -36,22 +54,19 @@ public class CharacterController implements Consts {
         System.out.println("new on " + c + " is " + type);
     }
 
+    /**
+     * Step of character by type
+     * @param pos character position
+     * @param how type of character
+     */
     public void step(Cell pos, int how) {
         Character character = getCharacter(pos);
         if (character != null && !character.checked) {
             Cell newPos;
             switch (how) {
-                case Character.RABBIT:
-                    if (character.howIs() != Character.RABBIT) return;
-                    break;
-                case Character.WOLF:
-                    if (character.howIs() != Character.WOLF) return;
-                    break;
-                case Character.WOLFW:
-                    if (character.howIs() != Character.WOLFW) return;
-                    break;
-                default:
-                    break;
+                case Character.RABBIT: if (character.howIs() != Character.RABBIT) return; else break;
+                case Character.WOLF:   if (character.howIs() != Character.WOLF)   return; else break;
+                case Character.WOLFW:  if (character.howIs() != Character.WOLFW)  return; else break;
             }
             try {
                 if (character.howIs() == Character.RABBIT) {
@@ -69,6 +84,12 @@ public class CharacterController implements Consts {
         }
     }
 
+    /**
+     * Handle step of rrabbit.
+     * @param rabbit character
+     * @param pos character position
+     * @return new position
+     */
     private Cell rabbitStep(Character rabbit, Cell pos) {
         rabbit.check();
         if (random.nextInt(4) == 1) {
@@ -81,6 +102,13 @@ public class CharacterController implements Consts {
         return randomStepZ(pos);
     }
 
+    /**
+     * Handle step of wolf.
+     * @param wolf character
+     * @param pos character position
+     * @return new position
+     * @throws CharacterIsDead
+     */
     private Cell wolfStep(Character wolf, Cell pos) throws CharacterIsDead {
         wolf.check();
         Cell c = checkAround(pos, Character.RABBIT);
@@ -89,7 +117,6 @@ public class CharacterController implements Consts {
             return c;
         }
         wolf.hungry();
-
         if (wolf.howIs() == Character.WOLF) {
             c = checkAround(pos, Character.WOLFW);
             if (c != null) {
@@ -110,6 +137,9 @@ public class CharacterController implements Consts {
         return randomStep(pos);
     }
 
+    /**
+     * Find characters around cell.
+     */
     private Cell checkAround(Cell pos, int type) {
         ArrayList<Integer> steps = getPlaces(pos, type);
         if (steps.size() == 0) return null;
@@ -119,6 +149,11 @@ public class CharacterController implements Consts {
         return new Cell(steps.get(stepDir)).add(pos);
     }
 
+    /**
+     * Make random step.
+     * @param pos cell
+     * @return new position
+     */
     private Cell randomStep(Cell pos) {
         ArrayList<Integer> steps = getPlaces(pos, -1);
         if (steps.size() == 0) return null;
@@ -128,6 +163,11 @@ public class CharacterController implements Consts {
         return pos.and(new Cell(steps.get(stepDir)));
     }
 
+    /**
+     * Make random step or stand still.
+     * @param pos cell
+     * @return new position
+     */
     private Cell randomStepZ(Cell pos) {
         ArrayList<Integer> steps = getPlaces(pos, -1);
         if (steps.size() == 0) return null;
@@ -139,6 +179,12 @@ public class CharacterController implements Consts {
         return pos.and(new Cell(steps.get(stepDir)));
     }
 
+    /**
+     * Find all the fields around the cell containing the character.
+     * @param pos cell
+     * @param type type of character
+     * @return all place containing the character.
+     */
     private ArrayList<Integer> getPlaces(Cell pos, int type) {
         ArrayList<Integer> steps = new ArrayList<>(7);
         for (int i = 1; i < 9; i++) {
@@ -160,6 +206,9 @@ public class CharacterController implements Consts {
         return steps;
     }
 
+    /**
+     * Remove the flag check.
+     */
     void uncheck() {
         for (int j = 0; j < SIZE; j++) {
             for (int i = 0; i < SIZE; i++) {
