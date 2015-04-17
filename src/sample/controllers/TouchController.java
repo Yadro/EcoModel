@@ -1,8 +1,9 @@
 package sample.controllers;
 
+import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
 
-import sample.models.Cell;
+import sample.models.*;
 import sample.models.Character;
 
 public class TouchController implements Tile, Consts {
@@ -14,18 +15,21 @@ public class TouchController implements Tile, Consts {
      */
     void click(MouseEvent e, Character[][] characters) {
         Cell c = new Cell((int) e.getX() / TILE_SIZE,(int) e.getY() / TILE_SIZE);
-        int type = 0;
-        switch (e.getButton()) {
-            case PRIMARY: type = Character.RABBIT; break;
-            case MIDDLE: type = Character.WOLFW; break;
-            case SECONDARY: type = Character.WOLF; break;
-        }
         if (c.inField()) {
             if (characters[c.y][c.x] != null) {
                 characters[c.y][c.x] = null;
             } else {
-                characters[c.y][c.x] = new Character(type);
+                characters[c.y][c.x] = createCharacterByButton(e.getButton());
             }
+        }
+    }
+
+    Character createCharacterByButton(MouseButton button) {
+        switch (button) {
+            case PRIMARY: return new Rabbit();
+            case SECONDARY: return new Wolf();
+            case MIDDLE: return new WolfW();
+            default: return new Character();
         }
     }
 

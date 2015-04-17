@@ -60,7 +60,7 @@ public class MainController extends Application implements Consts {
             case NEW_GAME: startGame(); break;
             case NEXT_STEP: makeStep(); break;
             case AGAIN: beginNewGame(); break;
-            case CLEAR: clearField(); break;
+            case CLEAR:   clearField(); break;
         }
         switch (status) {
             case CREATION: tc.click(e, characters); break;
@@ -68,7 +68,6 @@ public class MainController extends Application implements Consts {
             case END: break;
         }
         rc.render(characters, status);
-        System.out.println("render");
     }
 
     /**
@@ -83,7 +82,6 @@ public class MainController extends Application implements Consts {
             }
         }
         pc.uncheck();
-        System.out.println("step");
     }
 
     // todo не работает
@@ -140,80 +138,5 @@ public class MainController extends Application implements Consts {
             }
         }
         return true;
-    }
-
-    /*void debugLoop() {
-        for (int j = 0; j < SIZE; j++) {
-            for (int i = 0; i < SIZE; i++) {
-                pc.step(new Cell(i, j), how);
-            }
-        }
-        rc.render(characters, status);
-        if (++how > 3) {
-            pc.uncheck();
-            how = 1;
-        }
-        System.out.println("---------");
-    }*/
-
-    /*void debugStep() {
-        pc.step(now, firstFor);
-        rc.render(characters);
-
-        rc.renderPos(now.x, now.y);
-
-        now.x++;
-        if (now.x >= SIZE) {
-            now.x = 0;
-            now.y++;
-            if (now.y >= SIZE) {
-                now.y = 0;
-                if (firstFor) {
-                    firstFor = false;
-                } else {
-                    pc.uncheck();
-                    firstFor = true;
-                }
-            }
-        }
-    }*/
-
-
-    private void initialize() {
-        initRandomPers();
-        rc.render(characters, status);
-    }
-
-    private void initRandomPers() {
-        int[][] _perses = {
-                {0, 0, 0, 0, 3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
-                {2, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
-                {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
-                {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
-                {0, 3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
-                {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
-                {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
-                {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
-                {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
-                {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
-                {1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1},
-                {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
-                {0, 1, 3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
-                {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
-                {3, 0, 0, 0, 0, 0, 0, 0, 3, 0, 3, 0, 0, 0, 0, 0, 0, 0, 3, 0},
-                {0, 0, 1, 0, 3, 0, 1, 0, 0, 0, 0, 0, 1, 0, 3, 0, 1, 0, 0, 0},
-                {3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3},
-                {3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3},
-                {0, 1, 3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
-                {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
-                {3, 0, 0, 0, 0, 0, 0, 0, 3, 0, 3, 0, 0, 0, 0, 0, 0, 0, 3, 0},
-        };
-        for (int j = 0; j < SIZE; j++) {
-            for (int i = 0; i < SIZE; i++) {
-                if (_perses[i][j] != 0) {
-                    characters[i][j] = new Character(_perses[i][j]);
-                }
-            }
-        }
     }
 }

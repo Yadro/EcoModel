@@ -5,6 +5,9 @@ import javafx.scene.image.Image;
 import javafx.scene.paint.Color;
 
 import sample.models.Character;
+import sample.models.Rabbit;
+import sample.models.Wolf;
+import sample.models.WolfW;
 
 public class RenderController implements Tile, Consts {
 
@@ -14,9 +17,9 @@ public class RenderController implements Tile, Consts {
         this.gc = gc;
     }
 
-    void render(Character[][] perses, int status) {
+    void render(Character[][] characters, int status) {
         gc.clearRect(0, 0, 1024, 900);
-        renderTiles(perses);
+        renderTiles(characters);
         renderButtons(status);
     }
 
@@ -33,11 +36,11 @@ public class RenderController implements Tile, Consts {
 
     void renderDebug(Character p, int x, int y) {
         gc.setFill(Color.BLACK);
-        if (p.howIs() != 3) {
-            gc.fillText(String.valueOf(p.half), TILE_SIZE * x, TILE_SIZE * (y + 1));
+        if (p instanceof Wolf) {
+            gc.fillText(String.valueOf(((Wolf) p).half), TILE_SIZE * x, TILE_SIZE * (y + 1));
         }
-        if (p.howIs() == 2) {
-            if (p.pregnant) {
+        if (p instanceof WolfW) {
+            if (((WolfW) p).pregnant) {
                 gc.fillText("W", TILE_SIZE * x + 38, TILE_SIZE * (y + 1));
             } else {
                 gc.fillText("w", TILE_SIZE * x + 38, TILE_SIZE * (y + 1));
@@ -46,34 +49,27 @@ public class RenderController implements Tile, Consts {
         gc.fillText((p.checked) ? "1" : "0", TILE_SIZE * x, TILE_SIZE * y + 10);
     }
 
-    void renderTile(Character p, int x, int y) {
+    void renderTile(Character character, int x, int y) {
         gc.setStroke(Color.GREY);
         gc.strokeRect(x * TILE_SIZE, y * TILE_SIZE, TILE_SIZE, TILE_SIZE);
-        if (p == null) {
+        if (character == null) {
             return;
         }
-        switch (p.howIs()) {
-            case Character.WOLF:
-                drawImage(wolf, x, y);
-                break;
-            case Character.WOLFW:
-                drawImage(wolf, x, y);
-                break;
-            case Character.RABBIT:
-                drawImage(rabbit, x, y);
-                break;
-            default:
+        if (character instanceof Wolf) {
+            drawImage(wolf, x, y);
+        } else if (character instanceof Rabbit) {
+            drawImage(rabbit, x, y);
         }
-        renderDebug(p, x, y);
+        renderDebug(character, x, y);
     }
 
-    void renderTiles(Character[][] perses) {
-        int lengthY = perses.length;
-        int lengthX = perses[0].length;
+    void renderTiles(Character[][] characters) {
+        int lengthY = characters.length;
+        int lengthX = characters[0].length;
         for (int y = 0; y < lengthY; y++) {
             for (int x = 0; x < lengthX; x++) {
-                if (perses[y][x] != null) {
-                    renderTile(perses[y][x], x, y);
+                if (characters[y][x] != null) {
+                    renderTile(characters[y][x], x, y);
                 } else {
                     renderTile(null, x, y);
                 }
@@ -83,15 +79,15 @@ public class RenderController implements Tile, Consts {
 
     void renderButtons(int status) {
         switch (status) {
-            case MainController.CREATION:
+            case CREATION:
                 drawImage(play, SIZE, 0);
                 drawImage(clear, SIZE, 1);
                 break;
-            case MainController.PLAYING:
+            case PLAYING:
                 drawImage(next, SIZE, 1);
                 drawImage(update, SIZE, 2);
                 break;
-            case MainController.END:
+            case END:
                 drawImage(update, SIZE, 2);
                 break;
         }

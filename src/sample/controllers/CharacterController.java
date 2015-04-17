@@ -1,7 +1,7 @@
 package sample.controllers;
 
 import sample.exceptions.CharacterIsDead;
-import sample.models.Cell;
+import sample.models.*;
 import sample.models.Character;
 
 import java.util.ArrayList;
@@ -35,23 +35,23 @@ public class CharacterController implements Consts {
 
     /**
      * Add new character by type.
-     * @param c cell
+     * @param cell cell
      * @param type type of character
      */
-    void addCharacter(Cell c, int type) {
-        Character p;
-        if (type == Character.WOLF) {
+    void addCharacter(Cell cell, int type) {
+        Character character;
+        if (type == WOLF) {
             if (random.nextBoolean()) {
-                p = new Character(Character.WOLF);
+                character = new Wolf();
             } else {
-                p = new Character(Character.WOLFW);
+                character = new WolfW();
             }
         } else {
-            p = new Character(type);
+            character = new Rabbit();
         }
-        p.check();
-        characters[c.y][c.x] = p;
-        System.out.println("new on " + c + " is " + type);
+        character.check();
+        characters[cell.y][cell.x] = character;
+        System.out.println("new on " + character + " is " + type);
     }
 
     /**
@@ -62,17 +62,23 @@ public class CharacterController implements Consts {
     public void step(Cell pos, int how) {
         Character character = getCharacter(pos);
         if (character != null && !character.checked) {
-            Cell newPos;
             switch (how) {
-                case Character.RABBIT: if (character.howIs() != Character.RABBIT) return; else break;
-                case Character.WOLF:   if (character.howIs() != Character.WOLF)   return; else break;
-                case Character.WOLFW:  if (character.howIs() != Character.WOLFW)  return; else break;
+                case RABBIT:
+                    if (!(character instanceof Rabbit)) return;
+                    else break;
+                case WOLF:
+                    if (!(character instanceof Wolf)) return;
+                    else break;
+                case WOLFW:
+                    if (!(character instanceof WolfW)) return;
+                    else break;
             }
+            Cell newPos = null;
             try {
-                if (character.howIs() == Character.RABBIT) {
-                    newPos = rabbitStep(character, pos);
-                } else {
-                    newPos = wolfStep(character, pos);
+                if (character instanceof Rabbit) {
+                    newPos = rabbitStep((Rabbit) character, pos);
+                } else if (character instanceof Wolf) {
+                    newPos = wolfStep((Wolf) character, pos);
                 }
                 if (newPos != null) {
                     characters[newPos.y][newPos.x] = character;
@@ -90,12 +96,12 @@ public class CharacterController implements Consts {
      * @param pos character position
      * @return new position
      */
-    private Cell rabbitStep(Character rabbit, Cell pos) {
+    private Cell rabbitStep(Rabbit rabbit, Cell pos) {
         rabbit.check();
         if (random.nextInt(4) == 1) {
             Cell p = randomStep(pos);
             if (p != null) {
-                addCharacter(p, Character.RABBIT);
+                addCharacter(p, RABBIT);
             }
             return null;
         }
@@ -109,28 +115,29 @@ public class CharacterController implements Consts {
      * @return new position
      * @throws CharacterIsDead
      */
-    private Cell wolfStep(Character wolf, Cell pos) throws CharacterIsDead {
+    private Cell wolfStep(Wolf wolf, Cell pos) throws CharacterIsDead {
         wolf.check();
-        Cell c = checkAround(pos, Character.RABBIT);
+        Cell c = checkAround(pos, RABBIT);
         if (c != null) {
             wolf.eat();
             return c;
         }
         wolf.hungry();
-        if (wolf.howIs() == Character.WOLF) {
-            c = checkAround(pos, Character.WOLFW);
-            if (c != null) {
-                getCharacter(c).pregnant = true;
-            }
-        } else {
-            if (wolf.pregnant) {
-                wolf.pregnant = false;
+        if (wolf instanceof WolfW) {
+            WolfW wolfw = (WolfW) wolf;
+            if (wolfw.isPregnant()) {
+                wolfw.pregnant = false;
                 Cell p = randomStep(pos);
                 if (p != null) {
-                    addCharacter(p, Character.WOLF);
+                    addCharacter(p, WOLF);
                 }
                 if (!wolf.isLive()) throw new CharacterIsDead();
                 return null;
+            }
+        } else {
+            c = checkAround(pos, WOLFW);
+            if (c != null) {
+                ((WolfW) getCharacter(c)).pregnant();
             }
         }
         if (!wolf.isLive()) throw new CharacterIsDead();
@@ -155,7 +162,7 @@ public class CharacterController implements Consts {
      * @return new position
      */
     private Cell randomStep(Cell pos) {
-        ArrayList<Integer> steps = getPlaces(pos, -1);
+        ArrayList<Integer> steps = getPlaces(pos, 0);
         if (steps.size() == 0) return null;
         steps.forEach(System.out::print);
         int stepDir = random.nextInt(steps.size());
@@ -169,7 +176,7 @@ public class CharacterController implements Consts {
      * @return new position
      */
     private Cell randomStepZ(Cell pos) {
-        ArrayList<Integer> steps = getPlaces(pos, -1);
+        ArrayList<Integer> steps = getPlaces(pos, 0);
         if (steps.size() == 0) return null;
         steps.add(0);
         int stepDir = random.nextInt(steps.size());
@@ -190,14 +197,32 @@ public class CharacterController implements Consts {
         for (int i = 1; i < 9; i++) {
             Cell c = new Cell(i).add(pos);
             if (c.inField()) {
-                Character p = getCharacter(c);
-                if (type >= 0) {
-                    if (p != null && p.howIs() == type) {
-                        System.out.println("find on " + i + ": " + type);
-                        steps.add(i);
+                Character character = getCharacter(c);
+                if (type > 0) {
+                    if (character != null) {
+                        switch (type) {
+                            case WOLF:
+                                if (character instanceof Wolf) {
+                                    System.out.println("find on " + i + ": " + type);
+                                    steps.add(i);
+                                }
+                                break;
+                            case WOLFW:
+                                if (character instanceof WolfW) {
+                                    System.out.println("find on " + i + ": " + type);
+                                    steps.add(i);
+                                }
+                                break;
+                            case RABBIT:
+                                if (character instanceof Rabbit) {
+                                    System.out.println("find on " + i + ": " + type);
+                                    steps.add(i);
+                                }
+                                break;
+                        }
                     }
                 } else {
-                    if (p == null) {
+                    if (character == null) {
                         steps.add(i);
                     }
                 }

@@ -21,4 +21,8 @@ public interface Consts {
     /* Clear field */
     int CLEAR = 4;
 
+    int WOLF = 1;
+    int WOLFW = 2;
+    int RABBIT = 3;
+
 }
