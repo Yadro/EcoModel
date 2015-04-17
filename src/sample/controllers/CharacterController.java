@@ -98,7 +98,7 @@ public class CharacterController implements Consts {
      */
     private Cell rabbitStep(Rabbit rabbit, Cell pos) {
         rabbit.check();
-        if (random.nextInt(4) == 1) {
+        if (random.nextInt(4) == 1 && getCells(pos, RABBIT).size() == 0) {
             Cell p = randomStep(pos);
             if (p != null) {
                 addCharacter(p, RABBIT);
@@ -148,7 +148,7 @@ public class CharacterController implements Consts {
      * Find characters around cell.
      */
     private Cell checkAround(Cell pos, int type) {
-        ArrayList<Integer> steps = getPlaces(pos, type);
+        ArrayList<Integer> steps = getCells(pos, type);
         if (steps.size() == 0) return null;
         steps.forEach(System.out::print);
         int stepDir = random.nextInt(steps.size());
@@ -162,7 +162,7 @@ public class CharacterController implements Consts {
      * @return new position
      */
     private Cell randomStep(Cell pos) {
-        ArrayList<Integer> steps = getPlaces(pos, 0);
+        ArrayList<Integer> steps = getCells(pos, 0);
         if (steps.size() == 0) return null;
         steps.forEach(System.out::print);
         int stepDir = random.nextInt(steps.size());
@@ -176,7 +176,7 @@ public class CharacterController implements Consts {
      * @return new position
      */
     private Cell randomStepZ(Cell pos) {
-        ArrayList<Integer> steps = getPlaces(pos, 0);
+        ArrayList<Integer> steps = getCells(pos, 0);
         if (steps.size() == 0) return null;
         steps.add(0);
         int stepDir = random.nextInt(steps.size());
@@ -192,7 +192,7 @@ public class CharacterController implements Consts {
      * @param type type of character
      * @return all place containing the character.
      */
-    private ArrayList<Integer> getPlaces(Cell pos, int type) {
+    private ArrayList<Integer> getCells(Cell pos, int type) {
         ArrayList<Integer> steps = new ArrayList<>(7);
         for (int i = 1; i < 9; i++) {
             Cell c = new Cell(i).add(pos);

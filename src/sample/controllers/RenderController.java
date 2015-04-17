@@ -21,6 +21,7 @@ public class RenderController implements Tile, Consts {
         gc.clearRect(0, 0, 1024, 900);
         renderTiles(characters);
         renderButtons(status);
+        renderCount(characters);
     }
 
     void renderPos(int x, int y) {
@@ -34,6 +35,11 @@ public class RenderController implements Tile, Consts {
         gc.drawImage(i, TILE_SIZE * x, TILE_SIZE * y, TILE_SIZE, TILE_SIZE);
     }
 
+    void drawText(String str, int x, int y) {
+        gc.setFill(Color.BLACK);
+        gc.fillText(str, TILE_SIZE * x, TILE_SIZE * y);
+    }
+
     void renderDebug(Character p, int x, int y) {
         gc.setFill(Color.BLACK);
         if (p instanceof Wolf) {
@@ -41,12 +47,11 @@ public class RenderController implements Tile, Consts {
         }
         if (p instanceof WolfW) {
             if (((WolfW) p).pregnant) {
-                gc.fillText("W", TILE_SIZE * x + 38, TILE_SIZE * (y + 1));
+                gc.fillText("W", TILE_SIZE * x + 35, TILE_SIZE * (y + 1));
             } else {
-                gc.fillText("w", TILE_SIZE * x + 38, TILE_SIZE * (y + 1));
+                gc.fillText("w", TILE_SIZE * x + 35, TILE_SIZE * (y + 1));
             }
         }
-        gc.fillText((p.checked) ? "1" : "0", TILE_SIZE * x, TILE_SIZE * y + 10);
     }
 
     void renderTile(Character character, int x, int y) {
@@ -91,5 +96,23 @@ public class RenderController implements Tile, Consts {
                 drawImage(update, SIZE, 2);
                 break;
         }
+    }
+
+    void renderCount(Character[][] characters) {
+        int wolf = 0, wolfw = 0, sWolf = 0, rabbit = 0;
+        for (int j = 0; j < SIZE; j++) {
+            for (int i = 0; i < SIZE; i++) {
+                if (characters[j][i] instanceof Rabbit) rabbit++;
+                else if (characters[j][i] instanceof WolfW) {
+                    wolfw++;
+                    if (((WolfW) characters[j][i]).isPregnant()) {
+                        sWolf++;
+                    }
+                } else if (characters[j][i] instanceof Wolf) wolf++;
+            }
+        }
+        drawText("rabbit: " + rabbit, 20, 4);
+        drawText("wolf: " + wolf + ((sWolf > 0) ? " + " + sWolf : ""), 20, 5);
+        drawText("wolfw: " + wolfw, 20, 6);
     }
 }
