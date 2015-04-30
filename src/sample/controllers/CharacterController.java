@@ -198,37 +198,48 @@ public class CharacterController implements Consts {
             Cell c = new Cell(i).add(pos);
             if (c.inField()) {
                 Character character = getCharacter(c);
-                if (type > 0) {
-                    if (character != null) {
-                        switch (type) {
-                            case WOLF:
-                                if (character instanceof Wolf) {
-                                    System.out.println("find on " + i + ": " + type);
-                                    steps.add(i);
-                                }
-                                break;
-                            case WOLFW:
-                                if (character instanceof WolfW) {
-                                    System.out.println("find on " + i + ": " + type);
-                                    steps.add(i);
-                                }
-                                break;
-                            case RABBIT:
-                                if (character instanceof Rabbit) {
-                                    System.out.println("find on " + i + ": " + type);
-                                    steps.add(i);
-                                }
-                                break;
-                        }
-                    }
-                } else {
-                    if (character == null) {
-                        steps.add(i);
-                    }
-                }
+                addStep(steps, character, type, i);
             }
         }
         return steps;
+    }
+
+    /**
+     * Add position vector in array
+     * @param steps an array of the positions
+     * @param character character
+     * @param type type wanted character
+     * @param i number of position under consideration
+     */
+    private void addStep(ArrayList<Integer> steps, Character character, int type, int i) {
+        if (type > 0) {
+            if (character != null) {
+                switch (type) {
+                    case WOLF:
+                        if (character instanceof Wolf) {
+                            System.out.println("find on " + i + ": " + type);
+                            steps.add(i);
+                        }
+                        break;
+                    case WOLFW:
+                        if (character instanceof WolfW) {
+                            System.out.println("find on " + i + ": " + type);
+                            steps.add(i);
+                        }
+                        break;
+                    case RABBIT:
+                        if (character instanceof Rabbit) {
+                            System.out.println("find on " + i + ": " + type);
+                            steps.add(i);
+                        }
+                        break;
+                }
+            }
+        } else {
+            if (character == null) {
+                steps.add(i);
+            }
+        }
     }
 
     /**

@@ -84,7 +84,6 @@ public class MainController extends Application implements Consts {
         pc.uncheck();
     }
 
-    // todo не работает
     void restore() {
         characters = new Character[SIZE][SIZE];
         System.arraycopy(save, 0, characters, 0, save.length);
