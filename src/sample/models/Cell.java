@@ -84,8 +84,8 @@ public class Cell {
     }
 
     /**
-     * Клетка за пределами поля?
-     * @return
+     * Cell within the field?
+     * @return yes/no
      */
     public boolean inField() {
         return !(y < 0 || x < 0 || x > SIZE - 1 || y > SIZE - 1);
